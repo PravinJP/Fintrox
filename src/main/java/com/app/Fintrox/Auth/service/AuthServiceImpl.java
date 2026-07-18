@@ -9,13 +9,13 @@ import com.app.Fintrox.Auth.dto.response.UserResponse;
 import com.app.Fintrox.Auth.entity.User;
 import com.app.Fintrox.Auth.mapper.UserMapper;
 import com.app.Fintrox.Auth.repository.UserRepository;
+import com.app.Fintrox.security.auth.JwtTokenProvider;
+import com.app.Fintrox.security.permissions.UserType;
 import com.app.Fintrox.common.exceptions.BadRequestException;
 import com.app.Fintrox.common.exceptions.ResourceNotFoundException;
 import com.app.Fintrox.common.exceptions.UnauthorizedException;
-import com.app.Fintrox.security.auth.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -95,12 +95,28 @@ public class AuthServiceImpl implements AuthService {
             throw new BadRequestException("Phone number already registered");
         }
 
-        // Create user
-        User user = userMapper.toEntity(request);
-        user.setPassword(passwordEncoder.encode(request.getPassword()));
-        user.setActive(true);
-        user.setEmailVerified(false);
-        user.setPhoneVerified(false);
+        // ✅ FIXED: Create user with proper userType
+        UserType userType;
+        try {
+            userType = UserType.valueOf(request.getUserType().toUpperCase());
+        } catch (IllegalArgumentException | NullPointerException e) {
+            userType = UserType.INDIVIDUAL_LENDER; // Default
+        }
+
+        User user = User.builder()
+                .fullName(request.getFullName())
+                .email(request.getEmail())
+                .phone(request.getPhone())
+                .password(passwordEncoder.encode(request.getPassword()))
+                .userType(userType) // ✅ Explicitly set userType
+                .isActive(true)
+                .isEmailVerified(false)
+                .isPhoneVerified(false)
+                .build();
+
+        // ✅ Log the user before saving for debugging
+        log.info("Saving user: email={}, userType={}, fullName={}",
+                user.getEmail(), user.getUserType(), user.getFullName());
 
         User savedUser = userRepository.save(user);
 
@@ -261,4 +277,3 @@ public class AuthServiceImpl implements AuthService {
         log.info("Phone verified for user: {}", userId);
     }
 }
-

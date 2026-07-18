@@ -1,8 +1,5 @@
 package com.app.Fintrox.config;
 
-
-
-
 import com.app.Fintrox.security.auth.AuthEntryPoint;
 import com.app.Fintrox.security.auth.CustomUserDetailsService;
 import com.app.Fintrox.security.auth.JwtAuthenticationFilter;
@@ -64,8 +61,8 @@ public class SecurityConfig {
 
     @Bean
     public DaoAuthenticationProvider authenticationProvider() {
-        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-        authProvider.setUserDetailsService(userDetailsService);
+        // ✅ FIXED: Pass userDetailsService to constructor
+        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider(userDetailsService);
         authProvider.setPasswordEncoder(passwordEncoder());
         return authProvider;
     }

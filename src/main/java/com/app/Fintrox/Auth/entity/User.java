@@ -1,6 +1,5 @@
 package com.app.Fintrox.Auth.entity;
 
-  // ✅ Import from security/permissions
 import com.app.Fintrox.security.permissions.UserType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -41,7 +40,7 @@ public class User implements UserDetails {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private UserType userType;  // ✅ Uses UserType from security.permissions
+    private UserType userType;
 
     @Column(name = "organization_id")
     private Long organizationId;
@@ -49,12 +48,16 @@ public class User implements UserDetails {
     @Column(name = "employee_id")
     private Long employeeId;
 
+    // ✅ FIXED: Add @Builder.Default to fields with default values
+    @Builder.Default
     @Column(name = "is_active")
     private boolean isActive = true;
 
+    @Builder.Default
     @Column(name = "is_email_verified")
     private boolean isEmailVerified = false;
 
+    @Builder.Default
     @Column(name = "is_phone_verified")
     private boolean isPhoneVerified = false;
 
