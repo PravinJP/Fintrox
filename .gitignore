@@ -1,10 +1,35 @@
-HELP.md
-.gradle
-build/
-!gradle/wrapper/gradle-wrapper.jar
-!**/src/main/**/build/
-!**/src/test/**/build/
+# ============================================
+# FINTROX - GIT IGNORE
+# ============================================
 
+# ===== Sensitive Configuration Files =====
+# DO NOT commit these! They contain passwords, secrets, etc.
+src/main/resources/application.yml
+src/main/resources/application-dev.yml
+src/main/resources/application-prod.yml
+src/main/resources/application-*.yml
+src/main/resources/application-*.yaml
+.env
+.env.*
+*.secret
+*.key
+
+# ===== Build Artifacts =====
+build/
+.gradle/
+target/
+*.class
+*.jar
+*.war
+*.ear
+*.log
+
+# ===== Gradle =====
+.gradle/
+gradle-app.setting
+!gradle-wrapper.jar
+
+# ===== IDE Files =====
 ### STS ###
 .apt_generated
 .classpath
@@ -18,13 +43,17 @@ bin/
 !**/src/test/**/bin/
 
 ### IntelliJ IDEA ###
-.idea
+.idea/
 *.iws
 *.iml
 *.ipr
 out/
 !**/src/main/**/out/
 !**/src/test/**/out/
+
+### VS Code ###
+.vscode/
+*.code-workspace
 
 ### NetBeans ###
 /nbproject/private/
@@ -33,5 +62,40 @@ out/
 /nbdist/
 /.nb-gradle/
 
-### VS Code ###
-.vscode/
+# ===== System Files =====
+.DS_Store
+Thumbs.db
+*.tmp
+*.swp
+*.swo
+
+# ===== Logs =====
+logs/
+*.log
+*.log.gz
+
+# ===== Docker =====
+*.pid
+docker-compose.override.yml
+
+# ===== Testing =====
+*.test
+*.test.html
+*.test.js
+
+# ===== Environment =====
+*.env
+*.env.local
+*.env.*.local
+
+# ===== Coverage =====
+coverage/
+.nyc_output/
+
+# ===== Dependencies =====
+node_modules/
+.pnpm-store/
+
+# ===== Misc =====
+*.lock
+*.lock.json
