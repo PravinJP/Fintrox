@@ -233,13 +233,13 @@ public class RouteServiceImpl implements RouteService {
         Route route = routeRepository.findById(routeId)
                 .orElseThrow(() -> new ResourceNotFoundException("Route not found"));
 
-        // Get counts from repository
-        Long customerCount = routeRepository.countCustomersByRoute(routeId);
-        Long visitedCount = routeRepository.countVisitedCustomersByRoute(routeId);
-        Double collectionAmount = routeRepository.getTotalCollectionByRoute(routeId);
+        // ✅ Use default values (Customer module not built yet)
+        Long customerCount = 0L;
+        Long visitedCount = 0L;
+        Long pendingCount = 0L;
+        Double collectionAmount = 0.0;
 
-        Long pendingCount = customerCount - visitedCount;
-
+        // Get organization (optional - for display)
         Organization org = organizationRepository.findById(route.getOrganizationId()).orElse(null);
         Employee emp = route.getAssignedEmployeeId() != null ?
                 employeeRepository.findById(route.getAssignedEmployeeId()).orElse(null) : null;

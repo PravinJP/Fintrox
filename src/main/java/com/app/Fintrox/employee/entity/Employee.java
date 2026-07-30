@@ -1,7 +1,5 @@
 package com.app.Fintrox.employee.entity;
 
-
-
 import com.app.Fintrox.security.permissions.EmployeeRole;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -34,23 +32,23 @@ public class Employee {
     private String phone;
 
     @Column(unique = true, nullable = false, length = 20)
-    private String employeeCode;  // Auto-generated: EMP-20260728-0001
+    private String employeeCode;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private EmployeeRole role;  // COLLECTION_AGENT, FIELD_MANAGER, BRANCH_MANAGER
 
     @Column(name = "organization_id", nullable = false)
-    private Long organizationId;  // Which organization this employee belongs to
+    private Long organizationId;
 
     @Column(name = "user_id", nullable = false)
-    private Long userId;  // Link to User table (for login)
+    private Long userId;
 
     @Column(name = "route_id")
-    private Long routeId;  // Assigned route (optional)
+    private Long routeId;
 
     @Column(name = "loan_limit")
-    private BigDecimal loanLimit;  // Max loan amount this employee can approve
+    private BigDecimal loanLimit;  // Max loan amount they can approve (if applicable)
 
     @Column(name = "monthly_target")
     private BigDecimal monthlyTarget;  // Collection target per month
@@ -58,8 +56,7 @@ public class Employee {
     @Column(name = "daily_target")
     private BigDecimal dailyTarget;  // Collection target per day
 
-    @Column(name = "commission_rate")
-    private BigDecimal commissionRate;  // Commission percentage on collections
+    // ❌ REMOVED: commissionRate (not applicable)
 
     @Builder.Default
     @Column(name = "is_active")
@@ -67,19 +64,19 @@ public class Employee {
 
     @Builder.Default
     @Column(name = "is_online")
-    private boolean isOnline = false;  // For live tracking
+    private boolean isOnline = false;
 
     @Column(name = "last_check_in")
     private LocalDateTime lastCheckIn;
 
     @Column(name = "current_latitude")
-    private Double currentLatitude;  // For GPS tracking
+    private Double currentLatitude;
 
     @Column(name = "current_longitude")
-    private Double currentLongitude;  // For GPS tracking
+    private Double currentLongitude;
 
     @Column(name = "created_by", nullable = false)
-    private Long createdBy;  // Owner ID who created this employee
+    private Long createdBy;
 
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;

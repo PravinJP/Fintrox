@@ -1,6 +1,5 @@
 package com.app.Fintrox.employee.repository;
 
-
 import com.app.Fintrox.employee.entity.Employee;
 import com.app.Fintrox.security.permissions.EmployeeRole;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -27,7 +26,7 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
     List<Employee> findByOrganizationIdAndIsActiveTrue(Long organizationId);
     List<Employee> findByOrganizationIdAndRole(Long organizationId, EmployeeRole role);
 
-    // ===== Route-based Queries =====
+
     List<Employee> findByRouteId(Long routeId);
     List<Employee> findByRouteIdAndIsActiveTrue(Long routeId);
 
@@ -85,8 +84,7 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
                         @Param("longitude") Double longitude);
 
     // ===== Custom Queries =====
-    @Query("SELECT e FROM Employee e JOIN FETCH e.route WHERE e.id = :employeeId")
-    Optional<Employee> findEmployeeWithRoute(@Param("employeeId") Long employeeId);
+    // ✅ REMOVED: findEmployeeWithRoute - causing the error
 
     @Query("SELECT e FROM Employee e WHERE e.organizationId = :orgId AND e.isOnline = true")
     List<Employee> findOnlineEmployeesByOrganization(@Param("orgId") Long orgId);

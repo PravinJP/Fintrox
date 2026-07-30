@@ -57,20 +57,24 @@ public interface RouteRepository extends JpaRepository<Route, Long> {
     // ===== Update Queries =====
     @Modifying
     @Transactional
-    @Query("UPDATE Route r SET r.isActive = :active, r.updatedAt = CURRENT_TIMESTAMP WHERE r.id = :routeId")
+    @Query("UPDATE Route r SET r.isActive = :active WHERE r.id = :routeId")
     void updateActiveStatus(@Param("routeId") Long routeId, @Param("active") boolean active);
 
     @Modifying
     @Transactional
-    @Query("UPDATE Route r SET r.assignedEmployeeId = :employeeId, r.updatedAt = CURRENT_TIMESTAMP WHERE r.id = :routeId")
+    @Query("UPDATE Route r SET r.assignedEmployeeId = :employeeId WHERE r.id = :routeId")
     void assignEmployee(@Param("routeId") Long routeId, @Param("employeeId") Long employeeId);
 
     @Modifying
     @Transactional
-    @Query("UPDATE Route r SET r.assignedEmployeeId = NULL, r.updatedAt = CURRENT_TIMESTAMP WHERE r.assignedEmployeeId = :employeeId")
+    @Query("UPDATE Route r SET r.assignedEmployeeId = NULL WHERE r.assignedEmployeeId = :employeeId")
     void unassignEmployee(@Param("employeeId") Long employeeId);
 
-    // ===== Custom Queries =====
+    // ================================================================
+    // ⚠️ COMMENTED OUT - These require Customer entity that doesn't exist yet
+    // ================================================================
+
+    /*
     @Query("SELECT r FROM Route r JOIN FETCH r.organization WHERE r.id = :routeId")
     Optional<Route> findRouteWithOrganization(@Param("routeId") Long routeId);
 
@@ -82,4 +86,5 @@ public interface RouteRepository extends JpaRepository<Route, Long> {
 
     @Query("SELECT SUM(c.amount) FROM Collection c WHERE c.routeId = :routeId")
     Double getTotalCollectionByRoute(@Param("routeId") Long routeId);
+    */
 }

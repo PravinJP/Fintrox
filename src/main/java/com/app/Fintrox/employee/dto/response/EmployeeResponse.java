@@ -28,14 +28,14 @@ public class EmployeeResponse {
     private BigDecimal loanLimit;
     private BigDecimal monthlyTarget;
     private BigDecimal dailyTarget;
-    private BigDecimal commissionRate;
+    // ❌ REMOVED: commissionRate
     private boolean isActive;
     private boolean isOnline;
 
     // Performance metrics
     private BigDecimal todayCollection;
     private BigDecimal monthlyCollection;
-    private BigDecimal targetAchievementPercentage;
+    private Double targetAchievementPercentage;
     private Integer assignedCustomers;
     private Integer visitedCustomers;
     private Integer overdueCustomers;

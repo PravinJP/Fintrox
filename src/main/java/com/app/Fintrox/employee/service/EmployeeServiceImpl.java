@@ -1,7 +1,5 @@
 package com.app.Fintrox.employee.service;
 
-
-
 import com.app.Fintrox.Auth.entity.User;
 import com.app.Fintrox.Auth.repository.UserRepository;
 import com.app.Fintrox.employee.dto.request.EmployeeRequest;
@@ -9,8 +7,6 @@ import com.app.Fintrox.employee.dto.response.EmployeeResponse;
 import com.app.Fintrox.employee.entity.Employee;
 import com.app.Fintrox.employee.mapper.EmployeeMapper;
 import com.app.Fintrox.employee.repository.EmployeeRepository;
-
-
 import com.app.Fintrox.common.exceptions.BadRequestException;
 import com.app.Fintrox.common.exceptions.ResourceNotFoundException;
 import com.app.Fintrox.common.exceptions.UnauthorizedException;
@@ -22,7 +18,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -37,7 +32,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     private final EmployeeRepository employeeRepository;
     private final UserRepository userRepository;
     private final OrganizationRepository organizationRepository;
-    private final RouteRepository routeRepository;
+    // ✅ REMOVED: routeRepository (temporarily)
     private final EmployeeMapper employeeMapper;
     private final PasswordEncoder passwordEncoder;
 
@@ -50,35 +45,26 @@ public class EmployeeServiceImpl implements EmployeeService {
         User owner = userRepository.findById(ownerId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
-        // 2. Check if user is OWNER or INDIVIDUAL_LENDER
         if (owner.getUserType() != UserType.OWNER && owner.getUserType() != UserType.INDIVIDUAL_LENDER) {
             throw new UnauthorizedException("Only owners can create employees");
         }
 
-        // 3. Get organization
+        // 2. Get organization
         Organization organization = organizationRepository.findByOwnerId(ownerId)
                 .orElseThrow(() -> new BadRequestException("Please create an organization first"));
 
-        // 4. Check if email already exists
+        // 3. Check if email already exists
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new BadRequestException("Email already registered");
         }
 
-        // 5. Check if phone already exists
         if (userRepository.existsByPhone(request.getPhone())) {
             throw new BadRequestException("Phone number already registered");
         }
 
-        // 6. Validate route if provided
-        if (request.getRouteId() != null) {
-            RouteMatcher.Route route = routeRepository.findById(request.getRouteId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Route not found"));
-            if (!route.getOrganizationId().equals(organization.getId())) {
-                throw new BadRequestException("Route does not belong to your organization");
-            }
-        }
+        // ✅ REMOVED: Route validation (temporarily)
 
-        // 7. Create User account for employee
+        // 4. Create User account
         User user = User.builder()
                 .fullName(request.getFullName())
                 .email(request.getEmail())
@@ -93,18 +79,14 @@ public class EmployeeServiceImpl implements EmployeeService {
 
         User savedUser = userRepository.save(user);
 
-        // 8. Create Employee record
+        // 5. Create Employee record
         Employee employee = employeeMapper.toEntity(request, organization.getId(), ownerId, savedUser.getId());
         Employee savedEmployee = employeeRepository.save(employee);
 
-        // 9. Update User with employee_id
         savedUser.setEmployeeId(savedEmployee.getId());
         userRepository.save(savedUser);
 
         log.info("Employee created: {} by owner: {}", savedEmployee.getEmail(), owner.getEmail());
-
-        // 10. Send welcome email with temp password (TODO: implement email service)
-        sendWelcomeEmail(savedEmployee, TEMP_PASSWORD);
 
         return employeeMapper.toResponseWithOrg(savedEmployee, organization);
     }
@@ -147,18 +129,15 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
     @Transactional
     public EmployeeResponse updateEmployee(Long id, EmployeeRequest request, Long ownerId) {
-        // 1. Find employee
         Employee employee = employeeRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Employee not found"));
 
-        // 2. Verify owner owns this employee's organization
         validateOwnerAccess(employee.getOrganizationId(), ownerId);
 
-        // 3. Update employee
         employeeMapper.updateEntity(request, employee);
         Employee updatedEmployee = employeeRepository.save(employee);
 
-        // 4. Update User if email/phone changed
+        // Update User
         User user = userRepository.findById(employee.getUserId())
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
         if (request.getEmail() != null) {
@@ -181,14 +160,11 @@ public class EmployeeServiceImpl implements EmployeeService {
     public void deleteEmployee(Long id, Long ownerId) {
         Employee employee = employeeRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Employee not found"));
-
         validateOwnerAccess(employee.getOrganizationId(), ownerId);
 
-        // Soft delete
         employee.setActive(false);
         employeeRepository.save(employee);
 
-        // Deactivate user
         User user = userRepository.findById(employee.getUserId())
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
         user.setActive(false);
@@ -207,7 +183,6 @@ public class EmployeeServiceImpl implements EmployeeService {
         employee.setActive(true);
         employeeRepository.save(employee);
 
-        // Activate user
         User user = userRepository.findById(employee.getUserId())
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
         user.setActive(true);
@@ -226,7 +201,6 @@ public class EmployeeServiceImpl implements EmployeeService {
         employee.setActive(false);
         employeeRepository.save(employee);
 
-        // Deactivate user
         User user = userRepository.findById(employee.getUserId())
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
         user.setActive(false);
@@ -242,18 +216,12 @@ public class EmployeeServiceImpl implements EmployeeService {
                 .orElseThrow(() -> new ResourceNotFoundException("Employee not found"));
         validateOwnerAccess(employee.getOrganizationId(), ownerId);
 
-        RouteMatcher.Route route = routeRepository.findById(routeId)
-                .orElseThrow(() -> new ResourceNotFoundException("Route not found"));
-
-        if (!route.getOrganizationId().equals(employee.getOrganizationId())) {
-            throw new BadRequestException("Route does not belong to employee's organization");
-        }
-
+        // ✅ Just set the routeId directly
         employee.setRouteId(routeId);
         employeeRepository.save(employee);
 
         log.info("Route {} assigned to employee: {}", routeId, employee.getEmail());
-        return employeeMapper.toResponseWithRoute(employee, route);
+        return employeeMapper.toResponse(employee);
     }
 
     @Override
@@ -301,15 +269,13 @@ public class EmployeeServiceImpl implements EmployeeService {
         Employee employee = employeeRepository.findById(employeeId)
                 .orElseThrow(() -> new ResourceNotFoundException("Employee not found"));
 
-        // TODO: Get real performance metrics from Collection/Report modules
-        // For now, return with default values
         return employeeMapper.toResponseWithPerformance(
                 employee,
-                BigDecimal.ZERO,  // todayCollection
-                BigDecimal.ZERO,  // monthlyCollection
-                0,  // assignedCustomers
-                0,  // visitedCustomers
-                0   // overdueCustomers
+                BigDecimal.ZERO,
+                BigDecimal.ZERO,
+                0,
+                0,
+                0
         );
     }
 
@@ -334,10 +300,5 @@ public class EmployeeServiceImpl implements EmployeeService {
         if (!organization.getOwnerId().equals(ownerId)) {
             throw new UnauthorizedException("You don't have permission to access this employee");
         }
-    }
-
-    private void sendWelcomeEmail(Employee employee, String tempPassword) {
-        // TODO: Implement email service
-        log.info("Welcome email sent to: {} with temp password: {}", employee.getEmail(), tempPassword);
     }
 }

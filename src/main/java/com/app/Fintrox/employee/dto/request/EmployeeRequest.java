@@ -34,10 +34,10 @@ public class EmployeeRequest {
             message = "Role must be COLLECTION_AGENT, FIELD_MANAGER, or BRANCH_MANAGER")
     private String role;
 
-    private Long routeId;
+    private Long routeId;  // Optional
 
-    private BigDecimal loanLimit;  // Optional
-    private BigDecimal monthlyTarget;  // Optional
-    private BigDecimal dailyTarget;  // Optional
-    private BigDecimal commissionRate;  // Optional
+    private BigDecimal loanLimit;  // Optional - default 50000
+    private BigDecimal monthlyTarget;  // Optional - default 500000
+    private BigDecimal dailyTarget;  // Optional - default 25000
+
 }

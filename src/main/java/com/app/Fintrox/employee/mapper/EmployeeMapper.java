@@ -1,27 +1,24 @@
 package com.app.Fintrox.employee.mapper;
 
-
-
 import com.app.Fintrox.employee.dto.request.EmployeeRequest;
 import com.app.Fintrox.employee.dto.response.EmployeeResponse;
 import com.app.Fintrox.employee.entity.Employee;
 import com.app.Fintrox.organization.entity.Organization;
-import com.app.Fintrox.route.entity.Route;
 import com.app.Fintrox.security.permissions.EmployeeRole;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 @Component
 public class EmployeeMapper {
-
 
     public Employee toEntity(EmployeeRequest request, Long organizationId, Long createdBy, Long userId) {
         EmployeeRole role;
         try {
             role = EmployeeRole.valueOf(request.getRole());
         } catch (IllegalArgumentException e) {
-            role = EmployeeRole.COLLECTION_AGENT; // Default
+            role = EmployeeRole.COLLECTION_AGENT;
         }
 
         return Employee.builder()
@@ -35,12 +32,11 @@ public class EmployeeMapper {
                 .loanLimit(request.getLoanLimit() != null ? request.getLoanLimit() : new BigDecimal("50000"))
                 .monthlyTarget(request.getMonthlyTarget() != null ? request.getMonthlyTarget() : new BigDecimal("500000"))
                 .dailyTarget(request.getDailyTarget() != null ? request.getDailyTarget() : new BigDecimal("25000"))
-                .commissionRate(request.getCommissionRate() != null ? request.getCommissionRate() : new BigDecimal("2.5"))
+                // ❌ REMOVED: commissionRate
                 .isActive(true)
                 .createdBy(createdBy)
                 .build();
     }
-
 
     public void updateEntity(EmployeeRequest request, Employee employee) {
         if (request.getFullName() != null) {
@@ -71,11 +67,7 @@ public class EmployeeMapper {
         if (request.getDailyTarget() != null) {
             employee.setDailyTarget(request.getDailyTarget());
         }
-        if (request.getCommissionRate() != null) {
-            employee.setCommissionRate(request.getCommissionRate());
-        }
     }
-
 
     public EmployeeResponse toResponse(Employee employee) {
         return EmployeeResponse.builder()
@@ -91,14 +83,13 @@ public class EmployeeMapper {
                 .loanLimit(employee.getLoanLimit())
                 .monthlyTarget(employee.getMonthlyTarget())
                 .dailyTarget(employee.getDailyTarget())
-                .commissionRate(employee.getCommissionRate())
+                // ❌ REMOVED: commissionRate
                 .isActive(employee.isActive())
                 .isOnline(employee.isOnline())
                 .createdAt(employee.getCreatedAt())
                 .updatedAt(employee.getUpdatedAt())
                 .build();
     }
-
 
     public EmployeeResponse toResponseWithOrg(Employee employee, Organization organization) {
         EmployeeResponse response = toResponse(employee);
@@ -108,15 +99,13 @@ public class EmployeeMapper {
         return response;
     }
 
-
-    public EmployeeResponse toResponseWithRoute(Employee employee, Route route) {
+    public EmployeeResponse toResponseWithRoute(Employee employee, String routeName) {
         EmployeeResponse response = toResponse(employee);
-        if (route != null) {
-            response.setRouteName(route.getName());
+        if (routeName != null) {
+            response.setRouteName(routeName);
         }
         return response;
     }
-
 
     public EmployeeResponse toResponseWithPerformance(Employee employee,
                                                       BigDecimal todayCollection,
@@ -131,11 +120,11 @@ public class EmployeeMapper {
         response.setVisitedCustomers(visitedCustomers != null ? visitedCustomers : 0);
         response.setOverdueCustomers(overdueCustomers != null ? overdueCustomers : 0);
 
-        // Calculate achievement percentage
         if (employee.getMonthlyTarget() != null && employee.getMonthlyTarget().compareTo(BigDecimal.ZERO) > 0) {
-            BigDecimal achievement = (monthlyCollection != null ? monthlyCollection : BigDecimal.ZERO)
+            BigDecimal monthlyCol = monthlyCollection != null ? monthlyCollection : BigDecimal.ZERO;
+            BigDecimal achievement = monthlyCol
                     .multiply(new BigDecimal("100"))
-                    .divide(employee.getMonthlyTarget(), 2, java.math.RoundingMode.HALF_UP);
+                    .divide(employee.getMonthlyTarget(), 2, RoundingMode.HALF_UP);
             response.setTargetAchievementPercentage(achievement.doubleValue());
         } else {
             response.setTargetAchievementPercentage(0.0);
