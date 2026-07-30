@@ -19,7 +19,7 @@ import java.util.function.Function;
 @Slf4j
 public class JwtTokenProvider {
 
-    @Value("${jwt.secret:432tyfhc2f4c2c0vncu0c928utv820cv72untv0928ut2n9t8utmmc32u0}")
+    @Value("$${jwt.secret}")
     private String secret;
 
     @Value("${jwt.expiration:86400000}")

@@ -61,7 +61,7 @@ public class EmployeeController {
      * GET /api/employees/{id}
      */
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<EmployeeResponse>> getEmployee(@PathVariable Long id) {
+    public ResponseEntity<ApiResponse<EmployeeResponse>> getEmployee(@PathVariable("id") Long id) {
         log.info("Get employee request for id: {}", id);
         EmployeeResponse response = employeeService.getEmployeeById(id);
         return ResponseEntity.ok(ApiResponse.success("Employee details fetched", response));
@@ -73,7 +73,7 @@ public class EmployeeController {
      */
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse<EmployeeResponse>> updateEmployee(
-            @PathVariable Long id,
+            @PathVariable ("id")Long id,
             @Valid @RequestBody EmployeeRequest request) {
         Long ownerId = getCurrentUserId();
         log.info("Update employee request for id: {}", id);
@@ -86,7 +86,7 @@ public class EmployeeController {
      * DELETE /api/employees/{id}
      */
     @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponse<Void>> deleteEmployee(@PathVariable Long id) {
+    public ResponseEntity<ApiResponse<Void>> deleteEmployee(@PathVariable("id") Long id) {
         Long ownerId = getCurrentUserId();
         log.info("Delete employee request for id: {}", id);
         employeeService.deleteEmployee(id, ownerId);
@@ -98,7 +98,7 @@ public class EmployeeController {
      * PATCH /api/employees/{id}/activate
      */
     @PatchMapping("/{id}/activate")
-    public ResponseEntity<ApiResponse<Void>> activateEmployee(@PathVariable Long id) {
+    public ResponseEntity<ApiResponse<Void>> activateEmployee(@PathVariable("id")Long id) {
         Long ownerId = getCurrentUserId();
         log.info("Activate employee request for id: {}", id);
         employeeService.activateEmployee(id, ownerId);
@@ -110,7 +110,7 @@ public class EmployeeController {
      * PATCH /api/employees/{id}/deactivate
      */
     @PatchMapping("/{id}/deactivate")
-    public ResponseEntity<ApiResponse<Void>> deactivateEmployee(@PathVariable Long id) {
+    public ResponseEntity<ApiResponse<Void>> deactivateEmployee(@PathVariable("id") Long id) {
         Long ownerId = getCurrentUserId();
         log.info("Deactivate employee request for id: {}", id);
         employeeService.deactivateEmployee(id, ownerId);
@@ -125,7 +125,7 @@ public class EmployeeController {
      */
     @PatchMapping("/{id}/route")
     public ResponseEntity<ApiResponse<EmployeeResponse>> assignRoute(
-            @PathVariable Long id,
+            @PathVariable("id") Long id,
             @RequestParam Long routeId) {
         Long ownerId = getCurrentUserId();
         log.info("Assign route {} to employee: {}", routeId, id);
@@ -139,7 +139,7 @@ public class EmployeeController {
      */
     @PatchMapping("/{id}/target")
     public ResponseEntity<ApiResponse<EmployeeResponse>> setTargets(
-            @PathVariable Long id,
+            @PathVariable ("id")Long id,
             @RequestParam(required = false) BigDecimal monthlyTarget,
             @RequestParam(required = false) BigDecimal dailyTarget) {
         Long ownerId = getCurrentUserId();
