@@ -1,7 +1,5 @@
 package com.app.Fintrox.employee.controller;
 
-
-
 import com.app.Fintrox.employee.dto.request.EmployeeRequest;
 import com.app.Fintrox.employee.dto.response.EmployeeResponse;
 import com.app.Fintrox.employee.service.EmployeeService;
@@ -29,10 +27,6 @@ public class EmployeeController {
 
     // ===== Employee Management =====
 
-    /**
-     * Create a new employee (Owner only)
-     * POST /api/employees
-     */
     @PostMapping
     public ResponseEntity<ApiResponse<EmployeeResponse>> createEmployee(
             @Valid @RequestBody EmployeeRequest request) {
@@ -43,37 +37,25 @@ public class EmployeeController {
                 .body(ApiResponse.success("Employee created successfully", response));
     }
 
-    /**
-     * Get all employees in organization
-     * GET /api/employees
-     */
     @GetMapping
     public ResponseEntity<ApiResponse<List<EmployeeResponse>>> getAllEmployees() {
-        Long userId = getCurrentUserId();
-        // Get organization from user
-        // For now, use a simple approach - get all for the org
         List<EmployeeResponse> responses = employeeService.getEmployeesByOrganization(1L);
         return ResponseEntity.ok(ApiResponse.success("Employees fetched successfully", responses));
     }
 
-    /**
-     * Get employee by ID
-     * GET /api/employees/{id}
-     */
+    // ✅ FIXED: @PathVariable("id") with parameter name
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<EmployeeResponse>> getEmployee(@PathVariable("id") Long id) {
+    public ResponseEntity<ApiResponse<EmployeeResponse>> getEmployee(
+            @PathVariable("id") Long id) {
         log.info("Get employee request for id: {}", id);
         EmployeeResponse response = employeeService.getEmployeeById(id);
         return ResponseEntity.ok(ApiResponse.success("Employee details fetched", response));
     }
 
-    /**
-     * Update employee
-     * PUT /api/employees/{id}
-     */
+    // ✅ FIXED: @PathVariable("id") with parameter name
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse<EmployeeResponse>> updateEmployee(
-            @PathVariable ("id")Long id,
+            @PathVariable("id") Long id,
             @Valid @RequestBody EmployeeRequest request) {
         Long ownerId = getCurrentUserId();
         log.info("Update employee request for id: {}", id);
@@ -81,36 +63,30 @@ public class EmployeeController {
         return ResponseEntity.ok(ApiResponse.success("Employee updated successfully", response));
     }
 
-    /**
-     * Delete employee (soft delete)
-     * DELETE /api/employees/{id}
-     */
+    // ✅ FIXED: @PathVariable("id") with parameter name
     @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponse<Void>> deleteEmployee(@PathVariable("id") Long id) {
+    public ResponseEntity<ApiResponse<Void>> deleteEmployee(
+            @PathVariable("id") Long id) {
         Long ownerId = getCurrentUserId();
         log.info("Delete employee request for id: {}", id);
         employeeService.deleteEmployee(id, ownerId);
         return ResponseEntity.ok(ApiResponse.success("Employee deleted successfully"));
     }
 
-    /**
-     * Activate employee
-     * PATCH /api/employees/{id}/activate
-     */
+    // ✅ FIXED: @PathVariable("id") with parameter name
     @PatchMapping("/{id}/activate")
-    public ResponseEntity<ApiResponse<Void>> activateEmployee(@PathVariable("id")Long id) {
+    public ResponseEntity<ApiResponse<Void>> activateEmployee(
+            @PathVariable("id") Long id) {
         Long ownerId = getCurrentUserId();
         log.info("Activate employee request for id: {}", id);
         employeeService.activateEmployee(id, ownerId);
         return ResponseEntity.ok(ApiResponse.success("Employee activated successfully"));
     }
 
-    /**
-     * Deactivate employee
-     * PATCH /api/employees/{id}/deactivate
-     */
+    // ✅ FIXED: @PathVariable("id") with parameter name
     @PatchMapping("/{id}/deactivate")
-    public ResponseEntity<ApiResponse<Void>> deactivateEmployee(@PathVariable("id") Long id) {
+    public ResponseEntity<ApiResponse<Void>> deactivateEmployee(
+            @PathVariable("id") Long id) {
         Long ownerId = getCurrentUserId();
         log.info("Deactivate employee request for id: {}", id);
         employeeService.deactivateEmployee(id, ownerId);
@@ -119,29 +95,23 @@ public class EmployeeController {
 
     // ===== Route and Target Management =====
 
-    /**
-     * Assign route to employee
-     * PATCH /api/employees/{id}/route
-     */
+    // ✅ FIXED: @PathVariable("id") and @RequestParam("routeId")
     @PatchMapping("/{id}/route")
     public ResponseEntity<ApiResponse<EmployeeResponse>> assignRoute(
             @PathVariable("id") Long id,
-            @RequestParam Long routeId) {
+            @RequestParam("routeId") Long routeId) {
         Long ownerId = getCurrentUserId();
         log.info("Assign route {} to employee: {}", routeId, id);
         EmployeeResponse response = employeeService.assignRoute(id, routeId, ownerId);
         return ResponseEntity.ok(ApiResponse.success("Route assigned successfully", response));
     }
 
-    /**
-     * Set employee targets
-     * PATCH /api/employees/{id}/target
-     */
+    // ✅ FIXED: @PathVariable("id") with parameter name
     @PatchMapping("/{id}/target")
     public ResponseEntity<ApiResponse<EmployeeResponse>> setTargets(
-            @PathVariable ("id")Long id,
-            @RequestParam(required = false) BigDecimal monthlyTarget,
-            @RequestParam(required = false) BigDecimal dailyTarget) {
+            @PathVariable("id") Long id,
+            @RequestParam(value = "monthlyTarget", required = false) BigDecimal monthlyTarget,
+            @RequestParam(value = "dailyTarget", required = false) BigDecimal dailyTarget) {
         Long ownerId = getCurrentUserId();
         log.info("Set targets for employee: {}", id);
         EmployeeResponse response = employeeService.setTargets(id, monthlyTarget, dailyTarget, ownerId);
@@ -150,29 +120,19 @@ public class EmployeeController {
 
     // ===== Employee Dashboard =====
 
-    /**
-     * Get employee dashboard (Employee's own view)
-     * GET /api/employees/dashboard
-     */
     @GetMapping("/dashboard")
     public ResponseEntity<ApiResponse<EmployeeResponse>> getDashboard() {
-        Long userId = getCurrentUserId();
-        // Get employee by user ID
-        // For now, return with default
         EmployeeResponse response = employeeService.getEmployeeDashboard(1L);
         return ResponseEntity.ok(ApiResponse.success("Dashboard data fetched", response));
     }
 
     // ===== Search =====
 
-    /**
-     * Search employees
-     * GET /api/employees/search?query=john&organizationId=1
-     */
+    // ✅ FIXED: @RequestParam("query") with parameter name
     @GetMapping("/search")
     public ResponseEntity<ApiResponse<List<EmployeeResponse>>> searchEmployees(
-            @RequestParam String query,
-            @RequestParam(required = false) Long organizationId) {
+            @RequestParam("query") String query,
+            @RequestParam(value = "organizationId", required = false) Long organizationId) {
         log.info("Search employees with query: {}", query);
         List<EmployeeResponse> responses = employeeService.searchEmployees(query, organizationId);
         return ResponseEntity.ok(ApiResponse.success("Search results", responses));

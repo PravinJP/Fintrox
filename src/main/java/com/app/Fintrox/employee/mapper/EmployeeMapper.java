@@ -4,6 +4,7 @@ import com.app.Fintrox.employee.dto.request.EmployeeRequest;
 import com.app.Fintrox.employee.dto.response.EmployeeResponse;
 import com.app.Fintrox.employee.entity.Employee;
 import com.app.Fintrox.organization.entity.Organization;
+import com.app.Fintrox.route.entity.Route;
 import com.app.Fintrox.security.permissions.EmployeeRole;
 import org.springframework.stereotype.Component;
 
@@ -130,6 +131,17 @@ public class EmployeeMapper {
             response.setTargetAchievementPercentage(0.0);
         }
 
+        return response;
+    }
+
+    public EmployeeResponse toResponseWithRoute(Employee employee, Route route) {
+        EmployeeResponse response = toResponse(employee);
+        if (route != null) {
+            response.setRouteName(route.getName());
+            response.setRouteId(route.getId());
+        } else if (employee.getRouteId() != null) {
+            response.setRouteId(employee.getRouteId());
+        }
         return response;
     }
 }

@@ -12,6 +12,8 @@ import com.app.Fintrox.common.exceptions.ResourceNotFoundException;
 import com.app.Fintrox.common.exceptions.UnauthorizedException;
 import com.app.Fintrox.organization.entity.Organization;
 import com.app.Fintrox.organization.repository.OrganizationRepository;
+import com.app.Fintrox.route.entity.Route;
+import com.app.Fintrox.route.repository.RouteRepository;
 import com.app.Fintrox.security.permissions.UserType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,6 +37,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     // ✅ REMOVED: routeRepository (temporarily)
     private final EmployeeMapper employeeMapper;
     private final PasswordEncoder passwordEncoder;
+    private final RouteRepository routeRepository;
 
     private static final String TEMP_PASSWORD = "Temp@123456";
 
@@ -111,7 +114,19 @@ public class EmployeeServiceImpl implements EmployeeService {
     public EmployeeResponse getEmployeeById(Long id) {
         Employee employee = employeeRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Employee not found"));
-        return employeeMapper.toResponse(employee);
+
+        // ✅ Fetch route if routeId exists
+        String routeName = null;
+        if (employee.getRouteId() != null) {
+            Route route = routeRepository.findById(employee.getRouteId()).orElse(null);
+            if (route != null) {
+                routeName = route.getName();
+            }
+        }
+
+        EmployeeResponse response = employeeMapper.toResponse(employee);
+        response.setRouteName(routeName);  // ✅ Set route name
+        return response;
     }
 
     @Override
