@@ -12,16 +12,14 @@ import java.util.List;
 @Service
 public class LoanCalculatorService {
 
-    /**
-     * Calculate loan details and generate installment schedule
-     */
+
     public LoanCalculationResult calculateLoan(Double principal, Double interestRate,
                                                Integer tenureMonths, String loanType,
                                                LocalDate startDate) {
 
         LoanCalculationResult result = new LoanCalculationResult();
 
-        // 1. Calculate total interest
+
         Double totalInterest = principal * (interestRate / 100) * tenureMonths;
 
         // 2. Calculate total payable
@@ -68,9 +66,7 @@ public class LoanCalculatorService {
         return result;
     }
 
-    /**
-     * Generate installment schedule
-     */
+
     private List<InstallmentResponse> generateSchedule(
             Double totalPayable, Double installmentAmount, Integer totalInstallments,
             String loanType, LocalDate startDate) {
@@ -114,9 +110,7 @@ public class LoanCalculatorService {
         return schedule;
     }
 
-    /**
-     * Calculate end date
-     */
+
     private LocalDate calculateEndDate(LocalDate startDate, String loanType, Integer totalInstallments) {
         LocalDate endDate = startDate;
         switch (loanType.toUpperCase()) {
@@ -134,23 +128,17 @@ public class LoanCalculatorService {
         return endDate;
     }
 
-    /**
-     * Calculate outstanding balance
-     */
+
     public Double calculateOutstandingBalance(Double totalPayable, Double totalPaid) {
         return Math.round((totalPayable - totalPaid) * 100.0) / 100.0;
     }
 
-    /**
-     * Check if loan is overdue
-     */
+
     public boolean isOverdue(LocalDate nextDueDate) {
         return nextDueDate != null && nextDueDate.isBefore(LocalDate.now());
     }
 
-    /**
-     * Inner class for calculation results
-     */
+
     public static class LoanCalculationResult {
         private Double totalInterest;
         private Double totalPayable;
