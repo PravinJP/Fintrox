@@ -1,9 +1,8 @@
 package com.app.Fintrox.loan.mapper;
 
-
-
 import com.app.Fintrox.loan.dto.request.LoanRequest;
 import com.app.Fintrox.loan.dto.response.InstallmentResponse;
+import com.app.Fintrox.loan.dto.response.InstallmentScheduleDto;
 import com.app.Fintrox.loan.dto.response.LoanResponse;
 import com.app.Fintrox.loan.entity.Installment;
 import com.app.Fintrox.loan.entity.Loan;
@@ -68,27 +67,28 @@ public class LoanMapper {
     public LoanResponse toResponseWithSchedule(Loan loan, Customer customer, List<Installment> installments) {
         LoanResponse response = toResponseWithDetails(loan, customer);
         if (installments != null) {
-            List<InstallmentResponse> installmentResponses = installments.stream()
-                    .map(this::toInstallmentResponse)
+            List<InstallmentScheduleDto> installmentDtos = installments.stream()
+                    .map(this::toInstallmentScheduleDto)
                     .collect(Collectors.toList());
-            response.setInstallmentSchedule(installmentResponses);
+            response.setInstallmentSchedule(installmentDtos);
         }
         return response;
     }
 
-    public InstallmentResponse toInstallmentResponse(Installment installment) {
-        return InstallmentResponse.builder()
-                .id(installment.getId())
+    public LoanResponse toResponseWithScheduleDto(Loan loan, Customer customer, List<InstallmentScheduleDto> scheduleDtos) {
+        LoanResponse response = toResponseWithDetails(loan, customer);
+        if (scheduleDtos != null) {
+            response.setInstallmentSchedule(scheduleDtos);
+        }
+        return response;
+    }
+
+    public InstallmentScheduleDto toInstallmentScheduleDto(Installment installment) {
+        return InstallmentScheduleDto.builder()
                 .installmentNumber(installment.getInstallmentNumber())
                 .dueDate(installment.getDueDate())
                 .amount(installment.getAmount())
                 .status(installment.getStatus())
-                .paidDate(installment.getPaidDate())
-                .paidAmount(installment.getPaidAmount())
-                .paymentMethod(installment.getPaymentMethod())
-                .collectionId(installment.getCollectionId())
-                .createdAt(installment.getCreatedAt())
-                .updatedAt(installment.getUpdatedAt())
                 .build();
     }
 }

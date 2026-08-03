@@ -3,6 +3,7 @@ package com.app.Fintrox.loan.controller;
 
 
 import com.app.Fintrox.loan.dto.request.LoanRequest;
+import com.app.Fintrox.loan.dto.request.LoanUpdateRequest;
 import com.app.Fintrox.loan.dto.response.CustomerLoanSummary;
 import com.app.Fintrox.loan.dto.response.LoanResponse;
 import com.app.Fintrox.loan.service.LoanService;
@@ -37,6 +38,15 @@ public class LoanController {
         LoanResponse response = loanService.createLoan(request, userId, organizationId);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.success("Loan created successfully", response));
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<ApiResponse<LoanResponse>> updateLoan(
+            @PathVariable("id") Long id,
+            @Valid @RequestBody LoanUpdateRequest request) {
+        log.info("Update loan request for id: {}", id);
+        LoanResponse response = loanService.updateLoan(id, request);
+        return ResponseEntity.ok(ApiResponse.success("Loan updated successfully", response));
     }
 
     @GetMapping("/{id}")

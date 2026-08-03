@@ -3,6 +3,7 @@ package com.app.Fintrox.loan.service;
 
 
 import com.app.Fintrox.loan.dto.request.LoanRequest;
+import com.app.Fintrox.loan.dto.request.LoanUpdateRequest;
 import com.app.Fintrox.loan.dto.response.CustomerLoanSummary;
 import com.app.Fintrox.loan.dto.response.InstallmentResponse;
 import com.app.Fintrox.loan.dto.response.LoanResponse;
@@ -20,6 +21,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.app.Fintrox.loan.dto.response.InstallmentScheduleDto;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -103,6 +105,78 @@ public class LoanServiceImpl implements LoanService {
         return loanMapper.toResponseWithSchedule(savedLoan, customer, installments);
     }
 
+
+    @Override
+    @Transactional
+    public LoanResponse updateLoan(Long loanId, LoanUpdateRequest request) {
+        Loan loan = loanRepository.findById(loanId)
+                .orElseThrow(() -> new ResourceNotFoundException("Loan not found"));
+
+        if (!"ACTIVE".equals(loan.getStatus())) {
+            throw new BadRequestException("Only active loans can be updated");
+        }
+
+        long paidInstallments = installmentRepository.countByLoanIdAndStatus(loanId, "PAID");
+        if (paidInstallments > 0) {
+            throw new BadRequestException("Cannot update loan with paid installments");
+        }
+
+        if (request.getPrincipalAmount() != null) {
+            loan.setPrincipalAmount(request.getPrincipalAmount());
+        }
+        if (request.getInterestRate() != null) {
+            loan.setInterestRate(request.getInterestRate());
+        }
+        if (request.getTenureMonths() != null) {
+            loan.setTenureMonths(request.getTenureMonths());
+        }
+        if (request.getLoanType() != null) {
+            loan.setLoanType(request.getLoanType());
+        }
+        if (request.getStartDate() != null) {
+            loan.setStartDate(request.getStartDate());
+        }
+
+        LocalDate startDate = loan.getStartDate() != null ? loan.getStartDate() : LocalDate.now();
+        LoanCalculatorService.LoanCalculationResult calculation = loanCalculatorService.calculateLoan(
+                loan.getPrincipalAmount(),
+                loan.getInterestRate(),
+                loan.getTenureMonths(),
+                loan.getLoanType(),
+                startDate
+        );
+
+        loan.setTotalInterest(calculation.getTotalInterest());
+        loan.setTotalPayable(calculation.getTotalPayable());
+        loan.setInstallmentAmount(calculation.getInstallmentAmount());
+        loan.setTotalInstallments(calculation.getTotalInstallments());
+        loan.setEndDate(calculation.getEndDate());
+        loan.setNextDueDate(calculation.getInstallmentSchedule().get(0).getDueDate());
+        loan.setOutstandingBalance(calculation.getTotalPayable() - loan.getAmountPaid());
+
+        Loan updatedLoan = loanRepository.save(loan);
+
+        List<Installment> existingInstallments = installmentRepository.findByLoanId(loanId);
+        installmentRepository.deleteAll(existingInstallments);
+
+        List<Installment> newInstallments = new ArrayList<>();
+        for (InstallmentResponse installmentDto : calculation.getInstallmentSchedule()) {
+            Installment installment = Installment.builder()
+                    .loanId(updatedLoan.getId())
+                    .installmentNumber(installmentDto.getInstallmentNumber())
+                    .dueDate(installmentDto.getDueDate())
+                    .amount(installmentDto.getAmount())
+                    .status("PENDING")
+                    .isActive(true)
+                    .build();
+            newInstallments.add(installmentRepository.save(installment));
+        }
+
+        Customer customer = customerRepository.findById(loan.getCustomerId()).orElse(null);
+        log.info("Loan updated: {}", updatedLoan.getLoanNumber());
+
+        return loanMapper.toResponseWithSchedule(updatedLoan, customer, newInstallments);
+    }
     @Override
     public LoanResponse getLoanById(Long id) {
         Loan loan = loanRepository.findById(id)

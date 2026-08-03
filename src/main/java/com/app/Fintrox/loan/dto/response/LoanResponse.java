@@ -1,6 +1,5 @@
 package com.app.Fintrox.loan.dto.response;
 
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -22,7 +21,6 @@ public class LoanResponse {
     private String customerName;
     private String customerPhone;
 
-    // Loan Details
     private Double principalAmount;
     private Double interestRate;
     private Integer tenureMonths;
@@ -39,8 +37,8 @@ public class LoanResponse {
     private LocalDate endDate;
     private String status;
 
-    // Installment Schedule
-    private List<InstallmentResponse> installmentSchedule;
+    // ✅ Use the separate DTO
+    private List<InstallmentScheduleDto> installmentSchedule;
 
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

@@ -5,6 +5,7 @@ package com.app.Fintrox.loan.service;
 
 
 import com.app.Fintrox.loan.dto.request.LoanRequest;
+import com.app.Fintrox.loan.dto.request.LoanUpdateRequest;
 import com.app.Fintrox.loan.dto.response.CustomerLoanSummary;
 import com.app.Fintrox.loan.dto.response.LoanResponse;
 
@@ -23,6 +24,9 @@ public interface LoanService {
     List<LoanResponse> getActiveLoansByCustomer(Long customerId);
 
     List<LoanResponse> getLoansByStatus(String status, Long organizationId);
+
+    LoanResponse updateLoan(Long loanId, LoanUpdateRequest request);
+
 
     List<LoanResponse> getOverdueLoans(Long organizationId);
 
