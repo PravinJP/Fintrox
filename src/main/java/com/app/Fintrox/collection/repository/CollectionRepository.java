@@ -24,7 +24,7 @@ public interface CollectionRepository extends JpaRepository<Collection, Long> {
     List<Collection> findByLoanIdOrderByCreatedAtDesc(Long loanId);
     List<Collection> findByCustomerIdOrderByCreatedAtDesc(Long customerId);
 
-    @Query("SELECT c FROM Collection c WHERE DATE(c.createdAt) = CURRENT_DATE AND c.organizationId = :orgId")
+    @Query(value = "SELECT * FROM collections c WHERE DATE(c.created_at) = CURRENT_DATE AND c.organization_id = :orgId", nativeQuery = true)
     List<Collection> findTodayCollections(@Param("orgId") Long orgId);
 
     @Query("SELECT c FROM Collection c WHERE DATE(c.createdAt) = CURRENT_DATE AND c.employeeId = :employeeId")
