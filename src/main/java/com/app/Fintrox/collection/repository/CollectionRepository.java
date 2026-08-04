@@ -38,6 +38,6 @@ public interface CollectionRepository extends JpaRepository<Collection, Long> {
     @Query(value = "SELECT SUM(c.amount) FROM collections c WHERE DATE(c.created_at) = CURRENT_DATE AND c.organization_id = :orgId", nativeQuery = true)
     Double getTodayTotalCollection(@Param("orgId") Long orgId);
 
-    @Query("SELECT SUM(c.amount) FROM Collection c WHERE c.employeeId = :employeeId AND DATE(c.createdAt) = CURRENT_DATE")
+    @Query(value = "SELECT SUM(c.amount) FROM collections c WHERE c.employee_id = :employeeId AND DATE(c.created_at) = CURRENT_DATE", nativeQuery = true)
     Double getTodayCollectionByEmployee(@Param("employeeId") Long employeeId);
 }
