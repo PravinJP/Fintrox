@@ -6,7 +6,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -27,7 +26,7 @@ public interface CollectionRepository extends JpaRepository<Collection, Long> {
     @Query(value = "SELECT * FROM collections c WHERE DATE(c.created_at) = CURRENT_DATE AND c.organization_id = :orgId", nativeQuery = true)
     List<Collection> findTodayCollections(@Param("orgId") Long orgId);
 
-    @Query("SELECT c FROM Collection c WHERE DATE(c.createdAt) = CURRENT_DATE AND c.employeeId = :employeeId")
+    @Query(value = "SELECT * FROM collections c WHERE DATE(c.created_at) = CURRENT_DATE AND c.employee_id = :employeeId", nativeQuery = true)
     List<Collection> findTodayCollectionsByEmployee(@Param("employeeId") Long employeeId);
 
     @Query("SELECT SUM(c.amount) FROM Collection c WHERE c.loanId = :loanId")
@@ -36,7 +35,7 @@ public interface CollectionRepository extends JpaRepository<Collection, Long> {
     @Query("SELECT SUM(c.amount) FROM Collection c WHERE c.customerId = :customerId")
     Double getTotalCollectedByCustomer(@Param("customerId") Long customerId);
 
-    @Query("SELECT SUM(c.amount) FROM Collection c WHERE DATE(c.createdAt) = CURRENT_DATE AND c.organizationId = :orgId")
+    @Query(value = "SELECT SUM(c.amount) FROM collections c WHERE DATE(c.created_at) = CURRENT_DATE AND c.organization_id = :orgId", nativeQuery = true)
     Double getTodayTotalCollection(@Param("orgId") Long orgId);
 
     @Query("SELECT SUM(c.amount) FROM Collection c WHERE c.employeeId = :employeeId AND DATE(c.createdAt) = CURRENT_DATE")
