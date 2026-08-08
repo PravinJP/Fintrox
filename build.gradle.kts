@@ -27,6 +27,12 @@ dependencies {
     // Database
     runtimeOnly("org.postgresql:postgresql")
     runtimeOnly("com.h2database:h2")
+
+    implementation("org.apache.poi:poi:5.2.5")
+    implementation("org.apache.poi:poi-ooxml:5.2.5")
+
+    // PDF Export
+    implementation("com.itextpdf:itext7-core:7.2.5")
     
     // JWT Dependencies (JJWT)
     implementation("io.jsonwebtoken:jjwt-api:0.12.6")
@@ -48,4 +54,8 @@ dependencies {
 
 tasks.withType<Test> {
     useJUnitPlatform()
+}
+tasks.withType<JavaCompile> {
+    options.compilerArgs.add("-parameters")
+    options.encoding = "UTF-8"
 }

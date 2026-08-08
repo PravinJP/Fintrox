@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.List;
 
 @Service
 @Slf4j
@@ -25,6 +24,8 @@ public class ReportServiceImpl implements ReportService {
     private final CustomerRepository customerRepository;
     private final EmployeeRepository employeeRepository;
     private final InstallmentRepository installmentRepository;
+    private final ExcelExportService excelExportService;
+    private final PDFExportService pdfExportService;
 
     @Override
     public DailyCollectionReportDTO getDailyReport(Long organizationId, LocalDate date) {
@@ -110,15 +111,45 @@ public class ReportServiceImpl implements ReportService {
 
     @Override
     public byte[] exportToExcel(String reportType, Long organizationId, LocalDate startDate, LocalDate endDate) {
-        // TODO: Implement Excel export
         log.info("Exporting {} report to Excel", reportType);
-        return new byte[0];
+
+        switch (reportType.toLowerCase()) {
+            case "daily":
+                DailyCollectionReportDTO dailyReport = getDailyReport(organizationId, startDate);
+                return excelExportService.exportDailyReport(dailyReport);
+            case "employee":
+                EmployeePerformanceReportDTO empReport = getEmployeePerformanceReport(organizationId, startDate, endDate);
+                return excelExportService.exportEmployeePerformanceReport(empReport);
+            case "overdue":
+                OverdueLoanReportDTO overdueReport = getOverdueLoanReport(organizationId);
+                return excelExportService.exportOverdueLoanReport(overdueReport);
+            case "customer":
+                CustomerLoanReportDTO customerReport = getCustomerLoanReport(organizationId);
+                return excelExportService.exportCustomerLoanReport(customerReport);
+            default:
+                throw new IllegalArgumentException("Unknown report type: " + reportType);
+        }
     }
 
     @Override
     public byte[] exportToPDF(String reportType, Long organizationId, LocalDate startDate, LocalDate endDate) {
-        // TODO: Implement PDF export
         log.info("Exporting {} report to PDF", reportType);
-        return new byte[0];
+
+        switch (reportType.toLowerCase()) {
+            case "daily":
+                DailyCollectionReportDTO dailyReport = getDailyReport(organizationId, startDate);
+                return pdfExportService.exportDailyReport(dailyReport);
+            case "employee":
+                EmployeePerformanceReportDTO empReport = getEmployeePerformanceReport(organizationId, startDate, endDate);
+                return pdfExportService.exportEmployeePerformanceReport(empReport);
+            case "overdue":
+                OverdueLoanReportDTO overdueReport = getOverdueLoanReport(organizationId);
+                return pdfExportService.exportOverdueLoanReport(overdueReport);
+            case "customer":
+                CustomerLoanReportDTO customerReport = getCustomerLoanReport(organizationId);
+                return pdfExportService.exportCustomerLoanReport(customerReport);
+            default:
+                throw new IllegalArgumentException("Unknown report type: " + reportType);
+        }
     }
 }
