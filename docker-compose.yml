@@ -1,7 +1,7 @@
 version: '3.8'
 
 services:
-  # ===== PostgreSQL Database =====
+
   postgres:
     image: postgres:15-alpine
     container_name: fintrox_postgres
@@ -21,18 +21,37 @@ services:
       timeout: 5s
       retries: 5
 
-  # ===== Fintrox Application =====
+
+  redis:
+    image: redis:7-alpine
+    container_name: fintrox_redis
+    ports:
+      - "6379:6379"
+    networks:
+      - fintrox_network
+    restart: always
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+
   app:
     build: .
     container_name: fintrox_app
     depends_on:
       postgres:
         condition: service_healthy
+      redis:
+        condition: service_healthy
     environment:
       SPRING_PROFILES_ACTIVE: docker
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/fintrox
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: postgres
+      SPRING_REDIS_HOST: redis
+      SPRING_REDIS_PORT: 6379
       JWT_SECRET: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
     ports:
       - "8080:8080"

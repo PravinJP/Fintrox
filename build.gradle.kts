@@ -33,7 +33,13 @@ dependencies {
 
     // PDF Export
     implementation("com.itextpdf:itext7-core:7.2.5")
-    
+
+    implementation("org.springframework.boot:spring-boot-starter-data-redis")
+    implementation("org.springframework.boot:spring-boot-starter-cache")
+    implementation("org.apache.commons:commons-pool2")
+    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
+
+
     // JWT Dependencies (JJWT)
     implementation("io.jsonwebtoken:jjwt-api:0.12.6")
     runtimeOnly("io.jsonwebtoken:jjwt-impl:0.12.6")
@@ -58,4 +64,8 @@ tasks.withType<Test> {
 tasks.withType<JavaCompile> {
     options.compilerArgs.add("-parameters")
     options.encoding = "UTF-8"
+}
+
+tasks.withType<JavaCompile> {
+    options.compilerArgs.add("-parameters")
 }

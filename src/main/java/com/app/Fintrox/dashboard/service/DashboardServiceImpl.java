@@ -12,6 +12,7 @@ import com.app.Fintrox.loan.repository.LoanRepository;
 import com.app.Fintrox.loan.repository.InstallmentRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -29,8 +30,10 @@ public class DashboardServiceImpl implements DashboardService {
     private final EmployeeRepository employeeRepository;
     private final InstallmentRepository installmentRepository;
 
+    @Cacheable(value = "dashboard", key = "'dashboard_' + #organizationId")
     @Override
     public OwnerDashboardResponse getOwnerDashboard(Long organizationId) {
+        log.info("=== CACHE MISS - Fetching from Database ===");
         LocalDate today = LocalDate.now();
         LocalDate weekStart = today.minusDays(7);
         LocalDate monthStart = today.withDayOfMonth(1);

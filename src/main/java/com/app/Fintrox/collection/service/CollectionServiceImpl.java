@@ -19,6 +19,7 @@ import com.app.Fintrox.common.exceptions.BadRequestException;
 import com.app.Fintrox.common.exceptions.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,9 +39,12 @@ public class CollectionServiceImpl implements CollectionService {
     private final InstallmentRepository installmentRepository;
     private final CollectionMapper collectionMapper;
 
+
+    @CacheEvict(value = "dashboard", key = "#organizationId")
     @Override
     @Transactional
     public CollectionResponse recordCollection(CollectionRequest request, Long userId, Long organizationId, Long employeeId) {
+        log.info("=== CACHE EVICTED - Dashboard cache cleared ===");
         Loan loan = loanRepository.findById(request.getLoanId())
                 .orElseThrow(() -> new ResourceNotFoundException("Loan not found"));
 
