@@ -38,7 +38,7 @@ services:
 
 
   app:
-    build: .
+    build: ./backend
     container_name: fintrox_app
     depends_on:
       postgres:
