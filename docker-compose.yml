@@ -6,9 +6,9 @@ services:
     image: postgres:15-alpine
     container_name: fintrox_postgres
     environment:
-      POSTGRES_DB: fintrox
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: ${POSTGRES_DB}          # ✅ From .env
+      POSTGRES_USER: ${POSTGRES_USER}      # ✅ From .env
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}  # ✅ From .env
     ports:
       - "5432:5432"
     volumes:
@@ -16,11 +16,10 @@ services:
     networks:
       - fintrox_network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
       interval: 10s
       timeout: 5s
       retries: 5
-
 
   redis:
     image: redis:7-alpine
@@ -36,9 +35,10 @@ services:
       timeout: 5s
       retries: 5
 
-
   app:
-    build: ./backend
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
     container_name: fintrox_app
     depends_on:
       postgres:
@@ -47,12 +47,12 @@ services:
         condition: service_healthy
     environment:
       SPRING_PROFILES_ACTIVE: docker
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/fintrox
-      SPRING_DATASOURCE_USERNAME: postgres
-      SPRING_DATASOURCE_PASSWORD: postgres
-      SPRING_REDIS_HOST: redis
-      SPRING_REDIS_PORT: 6379
-      JWT_SECRET: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
+      SPRING_REDIS_HOST: ${REDIS_HOST:-redis}
+      SPRING_REDIS_PORT: ${REDIS_PORT:-6379}
+      JWT_SECRET: ${JWT_SECRET}
     ports:
       - "8080:8080"
     networks:

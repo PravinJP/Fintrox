@@ -1,20 +1,16 @@
-# ============================================
-# FINTROX - GIT IGNORE
-# ============================================
-
-# ===== Sensitive Configuration Files =====
-# DO NOT commit these! They contain passwords, secrets, etc.
-src/main/resources/application.yml
-src/main/resources/application-dev.yml
-src/main/resources/application-prod.yml
-src/main/resources/application-*.yml
-src/main/resources/application-*.yaml
+# ===== ENVIRONMENT FILES (NEVER COMMIT!) =====
 .env
 .env.*
+*.env
+*.env.local
+*.env.production
+
+# ===== SECRETS =====
 *.secret
 *.key
+secrets/
 
-# ===== Build Artifacts =====
+# ===== BUILD ARTIFACTS =====
 build/
 .gradle/
 target/
@@ -24,78 +20,37 @@ target/
 *.ear
 *.log
 
-# ===== Gradle =====
-.gradle/
-gradle-app.setting
-!gradle-wrapper.jar
+# ===== BACKEND =====
+backend/build/
+backend/.gradle/
+backend/bin/
 
-# ===== IDE Files =====
-### STS ###
-.apt_generated
-.classpath
-.factorypath
-.project
-.settings
-.springBeans
-.sts4-cache
-bin/
-!**/src/main/**/bin/
-!**/src/test/**/bin/
+# ===== FRONTEND =====
+frontend/node_modules/
+frontend/build/
+frontend/dist/
+frontend/.env.local
+frontend/.env.development.local
+frontend/.env.production.local
 
-### IntelliJ IDEA ###
+# ===== IDE =====
 .idea/
-*.iws
 *.iml
+*.iws
 *.ipr
-out/
-!**/src/main/**/out/
-!**/src/test/**/out/
-
-### VS Code ###
 .vscode/
-*.code-workspace
+.settings/
+.classpath
+.project
 
-### NetBeans ###
-/nbproject/private/
-/nbbuild/
-/dist/
-/nbdist/
-/.nb-gradle/
-
-# ===== System Files =====
+# ===== SYSTEM =====
 .DS_Store
 Thumbs.db
 *.tmp
-*.swp
-*.swo
 
-# ===== Logs =====
+# ===== LOGS =====
 logs/
 *.log
-*.log.gz
 
-# ===== Docker =====
+# ===== DOCKER =====
 *.pid
-docker-compose.override.yml
-
-# ===== Testing =====
-*.test
-*.test.html
-*.test.js
-
-# ===== Environment =====
-*.env
-*.env.local
-*.env.*.local
-
-# ===== Coverage =====
-coverage/
-.nyc_output/
-
-# ===== Dependencies =====
-node_modules/
-.pnpm-store/
-
-# ===== Misc =====
-*.lock
-*.lock.json
