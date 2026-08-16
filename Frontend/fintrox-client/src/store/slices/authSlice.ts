@@ -19,6 +19,7 @@ export const login = createAsyncThunk(
   'auth/login',
   async (data: { email: string; password: string }) => {
     const response = await api.post('/auth/login', data);
+    // ✅ The response is nested in response.data.data
     return response.data.data;
   }
 );
