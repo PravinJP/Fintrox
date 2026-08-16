@@ -4,8 +4,6 @@ import Footer from '../components/common/Footer';
 import Hero from '../components/landing/Hero';
 import TrustBar from '../components/landing/TrustBar';
 import Features from '../components/landing/Features';
-import './index.css';
-
 
 const LandingPage: React.FC = () => {
   return (
