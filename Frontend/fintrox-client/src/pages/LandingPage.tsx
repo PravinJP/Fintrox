@@ -4,10 +4,12 @@ import Footer from '../components/common/Footer';
 import Hero from '../components/landing/Hero';
 import TrustBar from '../components/landing/TrustBar';
 import Features from '../components/landing/Features';
+import './index.css';
+
 
 const LandingPage: React.FC = () => {
   return (
-    <div className="bg-background text-on-surface font-body-md antialiased overflow-x-hidden pt-20">
+    <div className="pt-20">
       <Header />
       <main>
         <Hero />
