@@ -3,6 +3,7 @@ import { useDispatch } from 'react-redux';
 import { useNavigate, Link } from 'react-router-dom';
 import { register } from '../../store/slices/authSlice';
 import type { AppDispatch } from '../../store/store';
+import toast from 'react-hot-toast';
 
 const Register: React.FC = () => {
   const [fullName, setFullName] = useState('');
@@ -29,10 +30,25 @@ const Register: React.FC = () => {
     }
 
     try {
-      await dispatch(register({ fullName, email, phone, password, userType })).unwrap();
+      const result = await dispatch(register({ 
+        fullName, 
+        email, 
+        phone, 
+        password, 
+        userType 
+      })).unwrap();
+      
+      console.log('✅ Registration successful:', result);
+      toast.success('Account created! Welcome to Fintrox!');
+      
+      // ✅ Auto-redirect to dashboard after successful registration
       navigate('/dashboard');
+      
     } catch (err: any) {
-      setError(err.message || 'Registration failed');
+      console.error('❌ Registration error:', err);
+      const errorMessage = err?.response?.data?.message || err?.message || 'Registration failed';
+      setError(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
