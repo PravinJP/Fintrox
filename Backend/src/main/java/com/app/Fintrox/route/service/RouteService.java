@@ -10,73 +10,36 @@ import java.util.List;
 
 public interface RouteService {
 
-    /**
-     * Create a new route (Owner only)
-     */
-    RouteResponse createRoute(RouteRequest request, Long ownerId);
+    RouteResponse createRoute(RouteRequest request, Long userId, Long organizationId);
 
-    /**
-     * Get route by ID
-     */
     RouteResponse getRouteById(Long id);
+    List<String> getDistinctAreasByOrganization(Long organizationId);
 
-    /**
-     * Get all routes in an organization
-     */
     List<RouteResponse> getRoutesByOrganization(Long organizationId);
 
-    /**
-     * Get active routes in an organization
-     */
     List<RouteResponse> getActiveRoutesByOrganization(Long organizationId);
 
-    /**
-     * Get routes assigned to an employee
-     */
     List<RouteResponse> getRoutesByEmployee(Long employeeId);
 
-    /**
-     * Update route details
-     */
-    RouteResponse updateRoute(Long id, RouteRequest request, Long ownerId);
+    List<RouteResponse> getRoutesAssignedToUser(Long userId);
 
-    /**
-     * Delete route (soft delete)
-     */
-    void deleteRoute(Long id, Long ownerId);
+    RouteResponse updateRoute(Long id, RouteRequest request, Long userId);
 
-    /**
-     * Activate route
-     */
-    void activateRoute(Long id, Long ownerId);
+    void deleteRoute(Long id, Long userId);
 
-    /**
-     * Deactivate route
-     */
-    void deactivateRoute(Long id, Long ownerId);
+    void activateRoute(Long id, Long userId);
 
-    /**
-     * Assign employee to route
-     */
-    RouteResponse assignEmployee(Long routeId, Long employeeId, Long ownerId);
+    void deactivateRoute(Long id, Long userId);
 
-    /**
-     * Unassign employee from route
-     */
-    RouteResponse unassignEmployee(Long routeId, Long ownerId);
+    RouteResponse assignEmployee(Long routeId, Long employeeId, Long userId);
 
-    /**
-     * Search routes
-     */
+    RouteResponse assignSelf(Long routeId, Long userId);
+
+    RouteResponse unassignEmployee(Long routeId, Long userId);
+
     List<RouteResponse> searchRoutes(String searchTerm, Long organizationId);
 
-    /**
-     * Get route dashboard (with customer counts)
-     */
     RouteResponse getRouteDashboard(Long routeId);
 
-    /**
-     * Get route entity by ID
-     */
     Route getRouteEntityById(Long id);
 }

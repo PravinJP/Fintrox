@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 
-const Sidebar: React.FC = () => {
+const DashboardSidebar: React.FC = () => {
   const location = useLocation();
 
   const menuItems = [
@@ -57,4 +57,4 @@ const Sidebar: React.FC = () => {
   );
 };
 
-export default Sidebar;
+export default DashboardSidebar;
