@@ -15,11 +15,17 @@ import java.util.Optional;
 @Repository
 public interface LoanRepository extends JpaRepository<Loan, Long> {
 
-    // ===== Basic Find Methods =====
     Optional<Loan> findById(Long id);
     Optional<Loan> findByLoanNumber(String loanNumber);
     List<Loan> findByCustomerId(Long customerId);
     List<Loan> findByOrganizationId(Long organizationId);
+
+    @Query("SELECT COALESCE(SUM(l.principalAmount), 0) FROM Loan l WHERE l.organizationId = :orgId")
+    Double getTotalLoanAmountByOrganization(@Param("orgId") Long orgId);
+
+
+
+
 
     // ===== Status-based Queries =====
     List<Loan> findByStatus(String status);

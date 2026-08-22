@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { RootState } from '../store/store';
-import { dashboardApi, DashboardData } from '../api/dashboardApi';
-import KPICard from '../components/dashboard/KPICard';
+import type { RootState } from '../store/store';
+import { dashboardApi } from '../api/dashboardApi';
+import type { DashboardData } from '../api/dashboardApi';import KPICard from '../components/dashboard/KPICard';
 import CollectionTrend from '../components/dashboard/CollectionTrend';
 import TopCollectors from '../components/dashboard/TopCollectors';
 import RecentCollections from '../components/dashboard/RecentCollections';
@@ -33,7 +33,6 @@ const Dashboard: React.FC = () => {
       } else if (user?.userType === 'INDIVIDUAL_LENDER') {
         response = await dashboardApi.getLenderDashboard();
       } else {
-        // Fallback to owner dashboard
         response = await dashboardApi.getOwnerDashboard();
       }
       
@@ -54,7 +53,6 @@ const Dashboard: React.FC = () => {
     }
   };
 
-  
   if (needsOrganization) {
     return (
       <div className="flex items-center justify-center h-[80vh]">
@@ -98,14 +96,12 @@ const Dashboard: React.FC = () => {
     );
   }
 
-  
   const isOwner = user?.userType === 'OWNER';
-  const isEmployee = user?.userType === 'EMPLOYEE';
   const isLender = user?.userType === 'INDIVIDUAL_LENDER';
+  const isEmployee = user?.userType === 'EMPLOYEE';
 
   return (
     <div className="max-w-7xl mx-auto flex flex-col gap-6">
-      {/* Welcome Section */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 mb-4">
         <div>
           <h2 className="text-[24px] leading-[32px] font-bold text-[#161d1f] tracking-[-0.01em] md:text-[32px] md:leading-[40px]">
@@ -121,7 +117,6 @@ const Dashboard: React.FC = () => {
         </div>
       </div>
 
-      {/* KPI Cards - Different for each user type */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {isOwner && (
           <>
@@ -201,7 +196,6 @@ const Dashboard: React.FC = () => {
         )}
       </div>
 
-      {/* Charts - Only for Owner */}
       {isOwner && (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <CollectionTrend data={data?.weeklyTrend || []} />
@@ -209,7 +203,6 @@ const Dashboard: React.FC = () => {
         </div>
       )}
 
-      {/* Recent Collections & Alerts */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <RecentCollections collections={data?.recentCollections || []} />
         {isOwner && <OverdueAlerts alerts={data?.alerts || []} />}

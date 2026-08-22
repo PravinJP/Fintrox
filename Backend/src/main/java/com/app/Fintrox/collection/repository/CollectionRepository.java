@@ -19,6 +19,10 @@ public interface CollectionRepository extends JpaRepository<Collection, Long> {
     List<Collection> findByCustomerId(Long customerId);
     List<Collection> findByEmployeeId(Long employeeId);
     List<Collection> findByOrganizationId(Long organizationId);
+    @Query("SELECT COALESCE(SUM(c.amount), 0) FROM Collection c WHERE c.organizationId = :orgId")
+    Double getTotalCollectionByOrganization(@Param("orgId") Long orgId);
+
+
 
     List<Collection> findByLoanIdOrderByCreatedAtDesc(Long loanId);
     List<Collection> findByCustomerIdOrderByCreatedAtDesc(Long customerId);
