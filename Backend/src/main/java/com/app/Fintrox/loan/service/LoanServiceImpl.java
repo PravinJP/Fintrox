@@ -233,12 +233,12 @@ public class LoanServiceImpl implements LoanService {
     }
 
     @Override
+
     public List<LoanResponse> getOverdueLoans(Long organizationId) {
         List<Loan> loans = loanRepository.findOverdueLoansByOrganization(organizationId, LocalDate.now());
         return loans.stream()
                 .map(loan -> {
-                    Customer customer = customerRepository.findById(loan.getCustomerId())
-                            .orElse(null);
+                    Customer customer = customerRepository.findById(loan.getCustomerId()).orElse(null);
                     return loanMapper.toResponseWithDetails(loan, customer);
                 })
                 .collect(Collectors.toList());

@@ -19,10 +19,6 @@ public interface CollectionRepository extends JpaRepository<Collection, Long> {
     List<Collection> findByCustomerId(Long customerId);
     List<Collection> findByEmployeeId(Long employeeId);
     List<Collection> findByOrganizationId(Long organizationId);
-    @Query("SELECT COALESCE(SUM(c.amount), 0) FROM Collection c WHERE c.organizationId = :orgId")
-    Double getTotalCollectionByOrganization(@Param("orgId") Long orgId);
-
-
 
     List<Collection> findByLoanIdOrderByCreatedAtDesc(Long loanId);
     List<Collection> findByCustomerIdOrderByCreatedAtDesc(Long customerId);
@@ -33,15 +29,18 @@ public interface CollectionRepository extends JpaRepository<Collection, Long> {
     @Query(value = "SELECT * FROM collections c WHERE DATE(c.created_at) = CURRENT_DATE AND c.employee_id = :employeeId", nativeQuery = true)
     List<Collection> findTodayCollectionsByEmployee(@Param("employeeId") Long employeeId);
 
-    @Query("SELECT SUM(c.amount) FROM Collection c WHERE c.loanId = :loanId")
+    @Query(value = "SELECT COALESCE(SUM(c.amount), 0) FROM collections c WHERE c.loan_id = :loanId", nativeQuery = true)
     Double getTotalCollectedByLoan(@Param("loanId") Long loanId);
 
-    @Query("SELECT SUM(c.amount) FROM Collection c WHERE c.customerId = :customerId")
+    @Query(value = "SELECT COALESCE(SUM(c.amount), 0) FROM collections c WHERE c.customer_id = :customerId", nativeQuery = true)
     Double getTotalCollectedByCustomer(@Param("customerId") Long customerId);
 
-    @Query(value = "SELECT SUM(c.amount) FROM collections c WHERE DATE(c.created_at) = CURRENT_DATE AND c.organization_id = :orgId", nativeQuery = true)
+    @Query(value = "SELECT COALESCE(SUM(c.amount), 0) FROM collections c WHERE DATE(c.created_at) = CURRENT_DATE AND c.organization_id = :orgId", nativeQuery = true)
     Double getTodayTotalCollection(@Param("orgId") Long orgId);
 
-    @Query(value = "SELECT SUM(c.amount) FROM collections c WHERE c.employee_id = :employeeId AND DATE(c.created_at) = CURRENT_DATE", nativeQuery = true)
+    @Query(value = "SELECT COALESCE(SUM(c.amount), 0) FROM collections c WHERE c.organization_id = :orgId", nativeQuery = true)
+    Double getTotalCollectionByOrganization(@Param("orgId") Long orgId);
+
+    @Query(value = "SELECT COALESCE(SUM(c.amount), 0) FROM collections c WHERE c.employee_id = :employeeId AND DATE(c.created_at) = CURRENT_DATE", nativeQuery = true)
     Double getTodayCollectionByEmployee(@Param("employeeId") Long employeeId);
 }

@@ -9,6 +9,7 @@ import com.app.Fintrox.common.exceptions.BadRequestException;
 import com.app.Fintrox.common.exceptions.UnauthorizedException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -46,10 +47,16 @@ public class DashboardController {
 
     @GetMapping("/lender")
     public ResponseEntity<ApiResponse<LenderDashboardResponse>> getLenderDashboard() {
-        Long organizationId = getCurrentOrganizationId();
-        log.info("Get lender dashboard for organization: {}", organizationId);
-        LenderDashboardResponse response = dashboardService.getLenderDashboard(organizationId);
-        return ResponseEntity.ok(ApiResponse.success("Dashboard data fetched", response));
+        try {
+            Long organizationId = getCurrentOrganizationId();
+            log.info("Get lender dashboard for organization: {}", organizationId);
+            LenderDashboardResponse response = dashboardService.getLenderDashboard(organizationId);
+            return ResponseEntity.ok(ApiResponse.success("Dashboard data fetched", response));
+        } catch (BadRequestException e) {
+            log.warn("Lender dashboard error: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(ApiResponse.error(e.getMessage()));
+        }
     }
 
     private Long getCurrentOrganizationId() {

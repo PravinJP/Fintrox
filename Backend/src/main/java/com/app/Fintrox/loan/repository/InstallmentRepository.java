@@ -1,6 +1,5 @@
 package com.app.Fintrox.loan.repository;
 
-
 import com.app.Fintrox.loan.entity.Installment;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -16,30 +15,24 @@ import java.util.Optional;
 @Repository
 public interface InstallmentRepository extends JpaRepository<Installment, Long> {
 
-    // ===== Loan-based Queries =====
     List<Installment> findByLoanId(Long loanId);
     List<Installment> findByLoanIdOrderByInstallmentNumberAsc(Long loanId);
 
-    // ===== Status-based Queries =====
     List<Installment> findByStatus(String status);
     List<Installment> findByLoanIdAndStatus(Long loanId, String status);
 
-    // ===== Due Date Queries =====
     List<Installment> findByDueDateBeforeAndStatus(LocalDate date, String status);
     List<Installment> findByDueDateAndStatus(LocalDate date, String status);
 
-    // ===== Find Next Due Installment =====
     @Query("SELECT i FROM Installment i WHERE i.loanId = :loanId AND i.status = 'PENDING' ORDER BY i.installmentNumber ASC")
     List<Installment> findPendingInstallments(@Param("loanId") Long loanId);
 
     @Query("SELECT i FROM Installment i WHERE i.loanId = :loanId AND i.status = 'PENDING' ORDER BY i.installmentNumber ASC LIMIT 1")
     Optional<Installment> findNextDueInstallment(@Param("loanId") Long loanId);
 
-    // ===== Count Queries =====
     long countByLoanIdAndStatus(Long loanId, String status);
     long countByLoanId(Long loanId);
 
-    // ===== Update Queries =====
     @Modifying
     @Transactional
     @Query("UPDATE Installment i SET i.status = :status WHERE i.id = :installmentId")

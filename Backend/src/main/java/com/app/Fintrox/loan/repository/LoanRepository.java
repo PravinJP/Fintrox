@@ -20,47 +20,32 @@ public interface LoanRepository extends JpaRepository<Loan, Long> {
     List<Loan> findByCustomerId(Long customerId);
     List<Loan> findByOrganizationId(Long organizationId);
 
-    @Query("SELECT COALESCE(SUM(l.principalAmount), 0) FROM Loan l WHERE l.organizationId = :orgId")
-    Double getTotalLoanAmountByOrganization(@Param("orgId") Long orgId);
-
-
-
-
-
-    // ===== Status-based Queries =====
     List<Loan> findByStatus(String status);
     List<Loan> findByStatusAndOrganizationId(String status, Long organizationId);
-    List<Loan> findByCustomerIdAndStatus(Long customerId, String status);
 
-    // ===== Active Loans =====
     List<Loan> findByIsActiveTrue();
     List<Loan> findByIsActiveTrueAndOrganizationId(Long organizationId);
 
-    // ===== Overdue Loans =====
+    List<Loan> findByCustomerIdAndIsActiveTrue(Long customerId);
+
     @Query("SELECT l FROM Loan l WHERE l.status = 'ACTIVE' AND l.nextDueDate < :date")
     List<Loan> findOverdueLoans(@Param("date") LocalDate date);
 
     @Query("SELECT l FROM Loan l WHERE l.organizationId = :orgId AND l.status = 'ACTIVE' AND l.nextDueDate < :date")
     List<Loan> findOverdueLoansByOrganization(@Param("orgId") Long orgId, @Param("date") LocalDate date);
 
-    // ===== Customer-based Queries =====
-    List<Loan> findByCustomerIdAndIsActiveTrue(Long customerId);
-
-    // ===== Count Queries =====
     long countByOrganizationId(Long organizationId);
     long countByOrganizationIdAndStatus(Long organizationId, String status);
 
-    // ===== Financial Summaries =====
-    @Query("SELECT SUM(l.principalAmount) FROM Loan l WHERE l.organizationId = :orgId AND l.status = 'ACTIVE'")
-    Double getTotalActiveLoanAmount(@Param("orgId") Long orgId);
+    @Query(value = "SELECT COALESCE(SUM(l.principal_amount), 0) FROM loans l WHERE l.organization_id = :orgId", nativeQuery = true)
+    Double getTotalLoanAmountByOrganization(@Param("orgId") Long orgId);
 
-    @Query("SELECT SUM(l.outstandingBalance) FROM Loan l WHERE l.organizationId = :orgId AND l.status = 'ACTIVE'")
+    @Query(value = "SELECT COALESCE(SUM(l.outstanding_balance), 0) FROM loans l WHERE l.organization_id = :orgId AND l.status = 'ACTIVE'", nativeQuery = true)
     Double getTotalOutstandingBalance(@Param("orgId") Long orgId);
 
-    @Query("SELECT SUM(l.amountPaid) FROM Loan l WHERE l.organizationId = :orgId AND l.status = 'ACTIVE'")
-    Double getTotalAmountReceived(@Param("orgId") Long orgId);
+    @Query(value = "SELECT COUNT(*) FROM loans l WHERE l.organization_id = :orgId AND l.status = :status", nativeQuery = true)
+    Long countByOrganizationIdAndStatusNative(@Param("orgId") Long orgId, @Param("status") String status);
 
-    // ===== Update Queries =====
     @Modifying
     @Transactional
     @Query("UPDATE Loan l SET l.status = :status WHERE l.id = :loanId")
