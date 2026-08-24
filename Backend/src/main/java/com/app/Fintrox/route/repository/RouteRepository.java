@@ -33,19 +33,11 @@ public interface RouteRepository extends JpaRepository<Route, Long> {
     long countByOrganizationId(Long organizationId);
     long countByOrganizationIdAndIsActiveTrue(Long organizationId);
 
-    @Query("SELECT r FROM Route r WHERE " +
-            "LOWER(r.name) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR " +
-            "LOWER(r.description) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR " +
-            "LOWER(r.area) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR " +
-            "LOWER(r.city) LIKE LOWER(CONCAT('%', :searchTerm, '%'))")
+    @Query("SELECT r FROM Route r WHERE LOWER(r.name) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR LOWER(r.description) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR LOWER(r.area) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR LOWER(r.city) LIKE LOWER(CONCAT('%', :searchTerm, '%'))")
     List<Route> searchRoutes(@Param("searchTerm") String searchTerm);
 
-    @Query("SELECT r FROM Route r WHERE r.organizationId = :orgId AND " +
-            "(LOWER(r.name) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR " +
-            "LOWER(r.description) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR " +
-            "LOWER(r.area) LIKE LOWER(CONCAT('%', :searchTerm, '%')))")
-    List<Route> searchRoutesInOrganization(@Param("orgId") Long orgId,
-                                           @Param("searchTerm") String searchTerm);
+    @Query("SELECT r FROM Route r WHERE r.organizationId = :orgId AND (LOWER(r.name) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR LOWER(r.description) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR LOWER(r.area) LIKE LOWER(CONCAT('%', :searchTerm, '%')))")
+    List<Route> searchRoutesInOrganization(@Param("orgId") Long orgId, @Param("searchTerm") String searchTerm);
 
     @Modifying
     @Transactional
@@ -62,24 +54,21 @@ public interface RouteRepository extends JpaRepository<Route, Long> {
     @Query("UPDATE Route r SET r.assignedEmployeeId = NULL WHERE r.assignedEmployeeId = :employeeId")
     void unassignEmployee(@Param("employeeId") Long employeeId);
 
-    @Query("SELECT COUNT(c) FROM Customer c WHERE c.routeId = :routeId")
+    @Query(value = "SELECT COUNT(*) FROM customers c WHERE c.route_id = :routeId", nativeQuery = true)
     Long countCustomersByRoute(@Param("routeId") Long routeId);
 
-    @Query("SELECT COUNT(c) FROM Customer c WHERE c.routeId = :routeId AND c.isVisited = true")
+    @Query(value = "SELECT COUNT(*) FROM customers c WHERE c.route_id = :routeId AND c.is_visited = true", nativeQuery = true)
     Long countVisitedCustomersByRoute(@Param("routeId") Long routeId);
 
-    @Query("SELECT SUM(c.amount) FROM Collection c WHERE c.routeId = :routeId")
+    @Query(value = "SELECT COALESCE(SUM(c.amount), 0) FROM collections c WHERE c.route_id = :routeId", nativeQuery = true)
     Double getTotalCollectionByRoute(@Param("routeId") Long routeId);
 
     Optional<Route> findByOrganizationIdAndAssignedEmployeeId(Long organizationId, Long employeeId);
-
     Optional<Route> findByIdAndOrganizationId(Long id, Long organizationId);
-
     boolean existsByOrganizationIdAndName(Long organizationId, String name);
 
     @Query("SELECT r FROM Route r WHERE r.organizationId = :orgId AND r.isActive = :active")
-    List<Route> findByOrganizationIdAndIsActive(@Param("orgId") Long orgId,
-                                                @Param("active") boolean active);
+    List<Route> findByOrganizationIdAndIsActive(@Param("orgId") Long orgId, @Param("active") boolean active);
 
     @Query("SELECT COUNT(r) FROM Route r WHERE r.organizationId = :orgId AND r.isActive = true")
     long countActiveRoutesByOrganization(@Param("orgId") Long orgId);
@@ -91,16 +80,6 @@ public interface RouteRepository extends JpaRepository<Route, Long> {
     List<Route> findActiveRoutesByOrganizationNative(@Param("orgId") Long orgId);
 
     List<Route> findByOrganizationIdAndNameContainingIgnoreCase(Long organizationId, String name);
-
-    @Modifying
-    @Transactional
-    @Query("UPDATE Route r SET r.assignedEmployeeId = :employeeId, r.updatedAt = CURRENT_TIMESTAMP WHERE r.id = :routeId")
-    void updateAssignedEmployeeWithTimestamp(@Param("routeId") Long routeId, @Param("employeeId") Long employeeId);
-
-    @Modifying
-    @Transactional
-    @Query("UPDATE Route r SET r.isActive = :active, r.updatedAt = CURRENT_TIMESTAMP WHERE r.id = :routeId")
-    void updateActiveStatusWithTimestamp(@Param("routeId") Long routeId, @Param("active") boolean active);
 
     @Query("SELECT DISTINCT r.area FROM Route r WHERE r.organizationId = :orgId")
     List<String> findDistinctAreasByOrganization(@Param("orgId") Long orgId);

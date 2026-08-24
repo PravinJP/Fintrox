@@ -30,20 +30,30 @@ const Register: React.FC = () => {
     }
 
     try {
-      const result = await dispatch(register({ 
-        fullName, 
-        email, 
-        phone, 
-        password, 
-        userType 
+      const result = await dispatch(register({
+        fullName,
+        email,
+        phone,
+        password,
+        userType
       })).unwrap();
-      
+
       console.log('✅ Registration successful:', result);
-      toast.success('Account created! Welcome to Fintrox!');
-      
-      // ✅ Auto-redirect to dashboard after successful registration
-      navigate('/dashboard');
-      
+
+      const token = localStorage.getItem('token');
+      console.log('Token saved:', token);
+
+      if (token) {
+        toast.success('Account created! Welcome to Fintrox!');
+        if (userType === 'INDIVIDUAL_LENDER') {
+          navigate('/settings/organization');
+        } else {
+          navigate('/dashboard');
+        }
+      } else {
+        throw new Error('Token not saved');
+      }
+
     } catch (err: any) {
       console.error('❌ Registration error:', err);
       const errorMessage = err?.response?.data?.message || err?.message || 'Registration failed';

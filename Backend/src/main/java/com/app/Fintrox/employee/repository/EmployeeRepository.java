@@ -15,36 +15,29 @@ import java.util.Optional;
 @Repository
 public interface EmployeeRepository extends JpaRepository<Employee, Long> {
 
-    // ===== Basic Find Methods =====
+    Optional<Employee> findById(Long id);
     Optional<Employee> findByEmail(String email);
     Optional<Employee> findByEmployeeCode(String employeeCode);
     Optional<Employee> findByUserId(Long userId);
-    Optional<Employee> findById(Long id);
 
-    // ===== Organization-based Queries =====
     List<Employee> findByOrganizationId(Long organizationId);
     List<Employee> findByOrganizationIdAndIsActiveTrue(Long organizationId);
     List<Employee> findByOrganizationIdAndRole(Long organizationId, EmployeeRole role);
 
-
     List<Employee> findByRouteId(Long routeId);
     List<Employee> findByRouteIdAndIsActiveTrue(Long routeId);
 
-    // ===== Status Queries =====
     List<Employee> findByIsActiveTrue();
     List<Employee> findByIsOnlineTrue();
 
-    // ===== Existence Checks =====
     boolean existsByEmail(String email);
     boolean existsByPhone(String phone);
     boolean existsByEmployeeCode(String employeeCode);
 
-    // ===== Count Queries =====
     long countByOrganizationId(Long organizationId);
     long countByOrganizationIdAndIsActiveTrue(Long organizationId);
     long countByOrganizationIdAndRole(Long organizationId, EmployeeRole role);
 
-    // ===== Search Queries =====
     @Query("SELECT e FROM Employee e WHERE " +
             "LOWER(e.fullName) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR " +
             "LOWER(e.email) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR " +
@@ -59,15 +52,14 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
     List<Employee> searchEmployeesInOrganization(@Param("orgId") Long orgId,
                                                  @Param("searchTerm") String searchTerm);
 
-    // ===== Update Queries =====
     @Modifying
     @Transactional
-    @Query("UPDATE Employee e SET e.isActive = :active, e.updatedAt = CURRENT_TIMESTAMP WHERE e.id = :employeeId")
+    @Query("UPDATE Employee e SET e.isActive = :active WHERE e.id = :employeeId")
     void updateActiveStatus(@Param("employeeId") Long employeeId, @Param("active") boolean active);
 
     @Modifying
     @Transactional
-    @Query("UPDATE Employee e SET e.routeId = :routeId, e.updatedAt = CURRENT_TIMESTAMP WHERE e.id = :employeeId")
+    @Query("UPDATE Employee e SET e.routeId = :routeId WHERE e.id = :employeeId")
     void assignRoute(@Param("employeeId") Long employeeId, @Param("routeId") Long routeId);
 
     @Modifying
@@ -83,12 +75,11 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
                         @Param("latitude") Double latitude,
                         @Param("longitude") Double longitude);
 
-    // ===== Custom Queries =====
-    // ✅ REMOVED: findEmployeeWithRoute - causing the error
-
     @Query("SELECT e FROM Employee e WHERE e.organizationId = :orgId AND e.isOnline = true")
     List<Employee> findOnlineEmployeesByOrganization(@Param("orgId") Long orgId);
 
     @Query("SELECT e FROM Employee e WHERE e.organizationId = :orgId ORDER BY e.monthlyTarget DESC")
     List<Employee> findEmployeesByTarget(@Param("orgId") Long orgId);
+
+    boolean existsByOrganizationIdAndUserId(Long organizationId, Long userId);
 }
