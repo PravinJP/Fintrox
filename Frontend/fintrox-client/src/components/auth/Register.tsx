@@ -44,12 +44,9 @@ const Register: React.FC = () => {
       console.log('Token saved:', token);
 
       if (token) {
-        toast.success('Account created! Welcome to Fintrox!');
-        if (userType === 'INDIVIDUAL_LENDER') {
-          navigate('/settings/organization');
-        } else {
-          navigate('/dashboard');
-        }
+        toast.success('Account created! Please set up your organization.');
+        // ✅ Both Owner and Individual Lender go to Create Organization
+        navigate('/settings/organization');
       } else {
         throw new Error('Token not saved');
       }

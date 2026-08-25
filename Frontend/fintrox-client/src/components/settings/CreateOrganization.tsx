@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-import type { RootState } from '../../store/store';
+import { RootState } from '../../store/store';
 import api from '../../api/axiosConfig';
 import toast from 'react-hot-toast';
 
@@ -18,7 +18,6 @@ const CreateOrganization: React.FC = () => {
     businessType: '',
   });
 
-  // ✅ Check if user is Individual Lender
   const isIndividualLender = user?.userType === 'INDIVIDUAL_LENDER';
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -32,7 +31,6 @@ const CreateOrganization: React.FC = () => {
     try {
       const payload = { ...formData };
       
-      // ✅ If Individual Lender, remove GST and set business type
       if (isIndividualLender) {
         delete payload.gst;
         payload.businessType = 'INDIVIDUAL';
@@ -126,7 +124,6 @@ const CreateOrganization: React.FC = () => {
                 />
               </div>
 
-              {/* ✅ GST - Show only for Finance Company Owners */}
               {!isIndividualLender && (
                 <div>
                   <label className="block text-sm font-semibold text-on-surface mb-1">
@@ -143,7 +140,6 @@ const CreateOrganization: React.FC = () => {
                 </div>
               )}
 
-              {/* ✅ Business Type - Show only for Finance Company Owners */}
               {!isIndividualLender && (
                 <div>
                   <label className="block text-sm font-semibold text-on-surface mb-1">
@@ -163,12 +159,11 @@ const CreateOrganization: React.FC = () => {
                 </div>
               )}
 
-              {/* ✅ For Individual Lender - Show simplified message */}
               {isIndividualLender && (
                 <div className="sm:col-span-2 mt-2">
                   <div className="bg-[#c1ecd4]/20 p-4 rounded-lg border border-[#c1ecd4]">
                     <p className="text-sm text-[#0e5138]">
-                      <span className="font-semibold">💡 Individual Lender:</span> GST and Business Type are not required for individual lenders. Your organization will be set up as "INDIVIDUAL".
+                      <span className="font-semibold">💡 Individual Lender:</span> GST and Business Type are not required. Your organization will be set up as "INDIVIDUAL".
                     </p>
                   </div>
                 </div>
@@ -182,13 +177,6 @@ const CreateOrganization: React.FC = () => {
                 className="w-full sm:w-auto flex justify-center py-3 px-8 border border-transparent rounded-[12px] shadow-sm font-semibold text-sm text-white bg-[#1b4332] hover:bg-[#2c694e] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#1b4332] transition-colors min-h-[48px] items-center disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {loading ? 'Creating...' : 'Create Organization'}
-              </button>
-              <button
-                type="button"
-                onClick={() => navigate('/dashboard')}
-                className="text-sm text-[#012d1d] hover:text-[#2c694e] transition-colors underline-offset-4 hover:underline"
-              >
-                Skip for now
               </button>
             </div>
           </form>
