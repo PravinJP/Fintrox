@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, Link } from 'react-router-dom';
 import { register } from '../../store/slices/authSlice';
-import { AppDispatch, RootState } from '../../store/store';
+import type { AppDispatch, RootState } from '../../store/store';
 import toast from 'react-hot-toast';
 
 const Register: React.FC = () => {

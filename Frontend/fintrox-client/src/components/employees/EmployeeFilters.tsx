@@ -1,5 +1,5 @@
 import React from 'react';
-import { EmployeeFilters as EmployeeFiltersType } from '../../api/employeeApi';
+import type { EmployeeFilters as EmployeeFiltersType } from '../../api/employeeApi';
 
 interface EmployeeFiltersProps {
   filters: EmployeeFiltersType;

@@ -1,5 +1,5 @@
 import React from 'react';
-import { EmployeeStats as EmployeeStatsType } from '../../api/employeeApi';
+import type { EmployeeStats as EmployeeStatsType } from '../../api/employeeApi';
 
 interface EmployeeStatsProps {
   stats: EmployeeStatsType;
