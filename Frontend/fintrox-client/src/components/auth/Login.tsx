@@ -1,40 +1,41 @@
 import React, { useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, Link } from 'react-router-dom';
 import { login } from '../../store/slices/authSlice';
-import type { AppDispatch } from '../../store/store';
+import { AppDispatch, RootState } from '../../store/store';
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
+  const { loading, error, isAuthenticated } = useSelector((state: RootState) => state.auth);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
-    setError('');
     
     try {
-      await dispatch(login({ email, password })).unwrap();
-      navigate('/dashboard');
+      const result = await dispatch(login({ email, password })).unwrap();
+      console.log('✅ Login successful:', result);
+      
+      // ✅ Check if user has organization
+      if (result.organizationId) {
+        navigate('/dashboard');
+      } else {
+        navigate('/settings/organization');
+      }
+      
     } catch (err: any) {
-      setError(err.message || 'Invalid email or password');
-    } finally {
-      setLoading(false);
+      console.error('❌ Login error:', err);
     }
   };
 
   return (
     <div className="h-screen w-full flex bg-[#f4fafd]">
-      {/* Left Side: Branding */}
       <div className="hidden lg:flex w-1/2 flex-col justify-between p-12 bg-[#eef5f7] border-r border-[#dde4e6] relative overflow-hidden">
         <div className="absolute inset-0 opacity-10 pointer-events-none" style={{ background: 'radial-gradient(circle at 100% 100%, #2d6a4f 0%, transparent 50%)' }}></div>
-        
         <div className="relative z-10">
           <div className="flex items-center gap-2 mb-4">
             <span className="material-symbols-outlined text-[#2d6a4f] text-4xl icon-fill-1">
@@ -48,7 +49,6 @@ const Login: React.FC = () => {
             Finance Management Platform
           </p>
         </div>
-
         <div className="relative z-10 flex-1 flex items-center justify-center py-12">
           <div className="w-full max-w-md aspect-square rounded-2xl bg-[#e8eff1] flex items-center justify-center overflow-hidden border border-[#bfc9c1] shadow-sm relative">
             <img 
@@ -59,17 +59,13 @@ const Login: React.FC = () => {
             <div className="absolute inset-0 bg-gradient-to-t from-[#eef5f7] via-transparent to-transparent opacity-50"></div>
           </div>
         </div>
-
         <div className="relative z-10">
           <p className="text-[14px] leading-[20px] text-[#404943] max-w-sm">
             Secure, precise, and professional tools to manage your assets with absolute clarity.
           </p>
         </div>
       </div>
-
-      {/* Right Side: Login Form */}
       <div className="w-full lg:w-1/2 flex items-center justify-center p-4 md:p-12 relative">
-        {/* Mobile Brand */}
         <div className="absolute top-4 left-4 lg:hidden flex items-center gap-2">
           <span className="material-symbols-outlined text-[#2d6a4f] text-3xl icon-fill-1">
             account_balance
@@ -78,7 +74,6 @@ const Login: React.FC = () => {
             Fintrox
           </span>
         </div>
-
         <div className="w-full max-w-[440px] bg-white rounded-[12px] p-8 shadow-[0_4px_12px_rgba(45,106,79,0.05)] border border-[#bfc9c1]/30">
           <div className="mb-8">
             <h2 className="text-[24px] leading-[32px] font-semibold text-[#161d1f] tracking-[-0.01em] mb-2">
@@ -88,15 +83,12 @@ const Login: React.FC = () => {
               Enter your credentials to access your dashboard.
             </p>
           </div>
-
           {error && (
             <div className="bg-[#ffdad6] text-[#93000a] p-3 rounded-lg mb-4 text-sm">
               {error}
             </div>
           )}
-
           <form onSubmit={handleSubmit} className="space-y-5">
-            {/* Email */}
             <div>
               <label className="block text-[12px] leading-[16px] font-medium tracking-[0.02em] text-[#404943] mb-1.5">
                 Email Address
@@ -115,8 +107,6 @@ const Login: React.FC = () => {
                 />
               </div>
             </div>
-
-            {/* Password */}
             <div>
               <div className="flex items-center justify-between mb-1.5">
                 <label className="block text-[12px] leading-[16px] font-medium tracking-[0.02em] text-[#404943]">
@@ -149,8 +139,6 @@ const Login: React.FC = () => {
                 </button>
               </div>
             </div>
-
-            {/* Remember Me */}
             <div className="flex items-center">
               <input
                 type="checkbox"
@@ -163,8 +151,6 @@ const Login: React.FC = () => {
                 Remember me
               </label>
             </div>
-
-            {/* Submit */}
             <div className="pt-2">
               <button
                 type="submit"
@@ -175,7 +161,6 @@ const Login: React.FC = () => {
               </button>
             </div>
           </form>
-
           <div className="mt-8 text-center">
             <p className="text-[14px] leading-[20px] text-[#404943]">
               Don't have an account?{' '}

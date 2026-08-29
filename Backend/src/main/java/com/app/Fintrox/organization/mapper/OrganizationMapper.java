@@ -20,18 +20,16 @@ public class OrganizationMapper {
                 .address(request.getAddress())
                 .phone(request.getPhone())
                 .email(request.getEmail())
-                .gst(request.getGst())
-                .businessType(request.getBusinessType() != null ? request.getBusinessType() : "INDIVIDUAL")
-                .isCompany(request.getBusinessType() != null &&
-                        !request.getBusinessType().equals("INDIVIDUAL"))
                 .ownerId(ownerId)
+                .gst(request.getGst() != null && !request.getGst().trim().isEmpty()
+                        ? request.getGst().trim()
+                        : null)
+                .businessType(request.getBusinessType())
                 .isActive(true)
                 .build();
     }
 
-    /**
-     * Update existing Organization entity with request data
-     */
+
     public void updateEntity(OrganizationRequest request, Organization organization) {
         if (request.getName() != null) {
             organization.setName(request.getName());
@@ -54,9 +52,7 @@ public class OrganizationMapper {
         }
     }
 
-    /**
-     * Convert Organization entity to OrganizationResponse DTO
-     */
+
     public OrganizationResponse toResponse(Organization organization) {
         return OrganizationResponse.builder()
                 .id(organization.getId())

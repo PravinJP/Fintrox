@@ -34,42 +34,34 @@ public class OrganizationServiceImpl implements OrganizationService {
     @Override
     @Transactional
     public OrganizationResponse createOrganization(OrganizationRequest request, Long ownerId) {
-        // 1. Validate owner exists
         User owner = userRepository.findById(ownerId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
-        // 2. Check if user is an OWNER
         if (owner.getUserType() != UserType.OWNER && owner.getUserType() != UserType.INDIVIDUAL_LENDER) {
             throw new UnauthorizedException("Only owners can create organizations");
         }
 
-        // 3. Check if owner already has an organization
         if (organizationRepository.existsByOwnerId(ownerId)) {
             throw new BadRequestException("You already have an organization registered");
         }
 
-        // 4. Validate email uniqueness
         if (organizationRepository.existsByEmail(request.getEmail())) {
             throw new BadRequestException("Email already registered by another organization");
         }
 
-        // 5. Validate phone uniqueness
         if (organizationRepository.existsByPhone(request.getPhone())) {
             throw new BadRequestException("Phone number already registered by another organization");
         }
 
-        // 6. Validate GST if provided
-        if (request.getGst() != null && !request.getGst().isEmpty()) {
-            if (organizationRepository.existsByGst(request.getGst())) {
+        if (request.getGst() != null && !request.getGst().trim().isEmpty()) {
+            if (organizationRepository.existsByGst(request.getGst().trim())) {
                 throw new BadRequestException("GST number already registered");
             }
         }
 
-        // 7. Create organization
         Organization organization = organizationMapper.toEntity(request, ownerId);
         Organization savedOrganization = organizationRepository.save(organization);
 
-        // 8. Update owner's organization ID
         owner.setOrganizationId(savedOrganization.getId());
         userRepository.save(owner);
 
@@ -77,7 +69,6 @@ public class OrganizationServiceImpl implements OrganizationService {
 
         return organizationMapper.toResponseWithOwner(savedOrganization, owner);
     }
-
     @Override
     public OrganizationResponse getOrganizationById(Long id) {
         Organization organization = organizationRepository.findById(id)

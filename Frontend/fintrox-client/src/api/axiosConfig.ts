@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-// ✅ Use hosted backend
+
 const API_URL = import.meta.env.VITE_API_URL || 'https://fintrox.onrender.com/api';
 
 const api = axios.create({
@@ -9,10 +9,10 @@ const api = axios.create({
     'Content-Type': 'application/json',
     'Accept': 'application/json',
   },
-  timeout: 30000, // ✅ Add timeout (30 seconds)
+  timeout: 30000, 
 });
 
-// ✅ Log requests for debugging
+
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token');
@@ -25,7 +25,7 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// ✅ Log responses for debugging
+
 api.interceptors.response.use(
   (response) => {
     console.log('✅ API Response:', response.status, response.config.url);

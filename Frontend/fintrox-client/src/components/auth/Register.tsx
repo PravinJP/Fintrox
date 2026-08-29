@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, Link } from 'react-router-dom';
 import { register } from '../../store/slices/authSlice';
-import type { AppDispatch } from '../../store/store';
+import { AppDispatch, RootState } from '../../store/store';
 import toast from 'react-hot-toast';
 
 const Register: React.FC = () => {
@@ -13,19 +13,15 @@ const Register: React.FC = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [userType, setUserType] = useState('OWNER');
   const [showPassword, setShowPassword] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
+  const { loading, error, isAuthenticated } = useSelector((state: RootState) => state.auth);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
-    setError('');
-
+    
     if (password !== confirmPassword) {
-      setError('Passwords do not match');
-      setLoading(false);
+      toast.error('Passwords do not match');
       return;
     }
 
@@ -37,27 +33,16 @@ const Register: React.FC = () => {
         password,
         userType
       })).unwrap();
-
+      
       console.log('✅ Registration successful:', result);
-
-      const token = localStorage.getItem('token');
-      console.log('Token saved:', token);
-
-      if (token) {
-        toast.success('Account created! Please set up your organization.');
-        // ✅ Both Owner and Individual Lender go to Create Organization
-        navigate('/settings/organization');
-      } else {
-        throw new Error('Token not saved');
-      }
-
+      toast.success('Account created! Please set up your organization.');
+      
+      // ✅ Navigate to create organization page
+      navigate('/settings/organization');
+      
     } catch (err: any) {
       console.error('❌ Registration error:', err);
-      const errorMessage = err?.response?.data?.message || err?.message || 'Registration failed';
-      setError(errorMessage);
-      toast.error(errorMessage);
-    } finally {
-      setLoading(false);
+      toast.error(err || 'Registration failed');
     }
   };
 
@@ -73,7 +58,6 @@ const Register: React.FC = () => {
               Fintrox
             </span>
           </div>
-
           <div className="mb-6">
             <h2 className="text-[24px] leading-[32px] font-semibold text-[#161d1f] tracking-[-0.01em] mb-2">
               Create Account
@@ -82,13 +66,11 @@ const Register: React.FC = () => {
               Start your free trial today
             </p>
           </div>
-
           {error && (
             <div className="bg-[#ffdad6] text-[#93000a] p-3 rounded-lg mb-4 text-sm">
               {error}
             </div>
           )}
-
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="block text-[12px] leading-[16px] font-medium tracking-[0.02em] text-[#404943] mb-1.5">
@@ -103,7 +85,6 @@ const Register: React.FC = () => {
                 required
               />
             </div>
-
             <div>
               <label className="block text-[12px] leading-[16px] font-medium tracking-[0.02em] text-[#404943] mb-1.5">
                 Email Address
@@ -117,7 +98,6 @@ const Register: React.FC = () => {
                 required
               />
             </div>
-
             <div>
               <label className="block text-[12px] leading-[16px] font-medium tracking-[0.02em] text-[#404943] mb-1.5">
                 Phone Number
@@ -131,7 +111,6 @@ const Register: React.FC = () => {
                 required
               />
             </div>
-
             <div>
               <label className="block text-[12px] leading-[16px] font-medium tracking-[0.02em] text-[#404943] mb-1.5">
                 Account Type
@@ -145,7 +124,6 @@ const Register: React.FC = () => {
                 <option value="INDIVIDUAL_LENDER">Individual Lender</option>
               </select>
             </div>
-
             <div>
               <label className="block text-[12px] leading-[16px] font-medium tracking-[0.02em] text-[#404943] mb-1.5">
                 Password
@@ -171,7 +149,6 @@ const Register: React.FC = () => {
                 </button>
               </div>
             </div>
-
             <div>
               <label className="block text-[12px] leading-[16px] font-medium tracking-[0.02em] text-[#404943] mb-1.5">
                 Confirm Password
@@ -185,7 +162,6 @@ const Register: React.FC = () => {
                 required
               />
             </div>
-
             <div className="pt-2">
               <button
                 type="submit"
@@ -196,7 +172,6 @@ const Register: React.FC = () => {
               </button>
             </div>
           </form>
-
           <div className="mt-6 text-center">
             <p className="text-[14px] leading-[20px] text-[#404943]">
               Already have an account?{' '}

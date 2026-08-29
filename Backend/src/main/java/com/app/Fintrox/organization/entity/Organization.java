@@ -23,7 +23,7 @@ public class Organization {
 
 
     @Column(nullable = false, length = 100)
-    private String name;  // Organization name (required for everyone)
+    private String name;  
 
     @Column(nullable = false, columnDefinition = "TEXT")
     private String address;  // Business address (required)
@@ -40,7 +40,7 @@ public class Organization {
 
 
     @Column(unique = true, length = 50)
-    private String gst;  // GST Number (Optional - for registered companies)
+    private String gst;  
 
     @Column(name = "business_type")
     private String businessType;  // INDIVIDUAL, PARTNERSHIP, PVT_LTD, LLP
