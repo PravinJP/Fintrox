@@ -15,7 +15,7 @@ const Register: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
-  const { loading, error, isAuthenticated } = useSelector((state: RootState) => state.auth);
+  const { loading, error } = useSelector((state: RootState) => state.auth);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
