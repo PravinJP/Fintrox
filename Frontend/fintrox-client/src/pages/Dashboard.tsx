@@ -3,7 +3,8 @@ import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import type { RootState } from '../store/store';
 import { dashboardApi } from '../api/dashboardApi';
-import type { DashboardData } from '../api/dashboardApi';import KPICard from '../components/dashboard/KPICard';
+import type { DashboardData } from '../api/dashboardApi';
+import KPICard from '../components/dashboard/KPICard';
 import CollectionTrend from '../components/dashboard/CollectionTrend';
 import TopCollectors from '../components/dashboard/TopCollectors';
 import RecentCollections from '../components/dashboard/RecentCollections';
@@ -36,7 +37,7 @@ const Dashboard: React.FC = () => {
         response = await dashboardApi.getOwnerDashboard();
       }
       
-      setData(response.data.data);
+      setData(response.data);
       setError('');
       setNeedsOrganization(false);
     } catch (err: any) {
