@@ -5,11 +5,20 @@ import type { RootState } from '../../store/store';
 import api from '../../api/axiosConfig';
 import toast from 'react-hot-toast';
 
+interface OrganizationFormData {
+  name: string;
+  address: string;
+  phone: string;
+  email: string;
+  gst?: string;
+  businessType?: string;
+}
+
 const CreateOrganization: React.FC = () => {
   const navigate = useNavigate();
   const user = useSelector((state: RootState) => state.auth.user);
   const [loading, setLoading] = useState(false);
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<OrganizationFormData>({
     name: '',
     address: '',
     phone: '',
@@ -29,14 +38,22 @@ const CreateOrganization: React.FC = () => {
     setLoading(true);
 
     try {
-      const payload = { ...formData };
+      const { gst, businessType, ...rest } = formData;
+      
+      let payload: any = { ...rest };
       
       if (isIndividualLender) {
-        delete payload.gst;
         payload.businessType = 'INDIVIDUAL';
+      } else {
+        if (gst && gst.trim()) {
+          payload.gst = gst;
+        }
+        if (businessType && businessType.trim()) {
+          payload.businessType = businessType;
+        }
       }
 
-      const response = await api.post('/organizations', payload);
+      await api.post('/organizations', payload);
       toast.success('Organization created successfully!');
       navigate('/dashboard');
     } catch (err: any) {
@@ -132,7 +149,7 @@ const CreateOrganization: React.FC = () => {
                   <input
                     type="text"
                     name="gst"
-                    value={formData.gst}
+                    value={formData.gst || ''}
                     onChange={handleChange}
                     className="block w-full rounded-[12px] border-[#c1c8c2] bg-white px-4 py-3 text-on-surface placeholder-[#717973] focus:ring-0 focus:border-[#1b4332] transition-all duration-200 focus:shadow-[0_0_0_3px_rgba(27,67,50,0.2)] outline-none"
                     placeholder="27AABCU1234D1ZP"
@@ -147,7 +164,7 @@ const CreateOrganization: React.FC = () => {
                   </label>
                   <select
                     name="businessType"
-                    value={formData.businessType}
+                    value={formData.businessType || ''}
                     onChange={handleChange}
                     className="block w-full rounded-[12px] border-[#c1c8c2] bg-white px-4 py-3 text-on-surface focus:ring-0 focus:border-[#1b4332] transition-all duration-200 focus:shadow-[0_0_0_3px_rgba(27,67,50,0.2)] outline-none"
                   >
