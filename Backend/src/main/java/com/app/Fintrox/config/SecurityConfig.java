@@ -6,6 +6,7 @@ import com.app.Fintrox.security.auth.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -35,60 +36,155 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+
         http
+                // CORS
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+
+                // CSRF disabled because we are using JWT
                 .csrf(csrf -> csrf.disable())
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .exceptionHandling(exception -> exception.authenticationEntryPoint(authEntryPoint))
+
+                // Stateless authentication
+                .sessionManagement(session ->
+                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                )
+
+                // Authentication error handling
+                .exceptionHandling(exception ->
+                        exception.authenticationEntryPoint(authEntryPoint)
+                )
+
+                // Authorization rules
                 .authorizeHttpRequests(auth -> auth
-                        // Public endpoints
+
+                        // Allow CORS preflight requests
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+
+                        // Authentication APIs
                         .requestMatchers("/api/auth/**").permitAll()
+
+                        // Public APIs
                         .requestMatchers("/api/public/**").permitAll()
-                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll()
+
+                        // Swagger
+                        .requestMatchers(
+                                "/swagger-ui/**",
+                                "/v3/api-docs/**",
+                                "/swagger-ui.html"
+                        ).permitAll()
+
+                        // H2 console
                         .requestMatchers("/h2-console/**").permitAll()
+
+                        // Health check
                         .requestMatchers("/actuator/health").permitAll()
-                        // Authenticated endpoints
+
+                        // Everything else requires authentication
                         .anyRequest().authenticated()
                 )
-                .authenticationProvider(authenticationProvider())
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
-        // For H2 console (development only)
-        http.headers(headers -> headers.frameOptions(frame -> frame.disable()));
+                // Authentication provider
+                .authenticationProvider(authenticationProvider())
+
+                // JWT filter
+                .addFilterBefore(
+                        jwtAuthenticationFilter,
+                        UsernamePasswordAuthenticationFilter.class
+                );
+
+        // H2 console support - development only
+        http.headers(headers ->
+                headers.frameOptions(frame -> frame.disable())
+        );
 
         return http.build();
     }
 
+    /**
+     * Authentication Provider
+     */
     @Bean
     public DaoAuthenticationProvider authenticationProvider() {
-        // ✅ FIXED: Pass userDetailsService to constructor
-        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider(userDetailsService);
+
+        DaoAuthenticationProvider authProvider =
+                new DaoAuthenticationProvider(userDetailsService);
+
         authProvider.setPasswordEncoder(passwordEncoder());
+
         return authProvider;
     }
 
+    /**
+     * Password Encoder
+     */
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
+    /**
+     * Authentication Manager
+     */
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
+    public AuthenticationManager authenticationManager(
+            AuthenticationConfiguration authConfig
+    ) throws Exception {
+
         return authConfig.getAuthenticationManager();
     }
 
+    /**
+     * CORS Configuration
+     */
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
+
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000", "http://localhost:5173"));
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
+
+        /*
+         * Allow localhost during development
+         * and Vercel deployments in production.
+         */
+        configuration.setAllowedOriginPatterns(Arrays.asList(
+                "http://localhost:*",
+                "http://127.0.0.1:*",
+                "https://*.vercel.app"
+        ));
+
+        /*
+         * Allowed HTTP methods
+         */
+        configuration.setAllowedMethods(Arrays.asList(
+                "GET",
+                "POST",
+                "PUT",
+                "PATCH",
+                "DELETE",
+                "OPTIONS"
+        ));
+
+        /*
+         * Allow all request headers
+         */
         configuration.setAllowedHeaders(Arrays.asList("*"));
-        configuration.setExposedHeaders(Arrays.asList("Authorization"));
+
+
+        configuration.setExposedHeaders(Arrays.asList(
+                "Authorization"
+        ));
+
+
         configuration.setAllowCredentials(true);
+
+
         configuration.setMaxAge(3600L);
 
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+
+        UrlBasedCorsConfigurationSource source =
+                new UrlBasedCorsConfigurationSource();
+
         source.registerCorsConfiguration("/**", configuration);
+
         return source;
     }
 }

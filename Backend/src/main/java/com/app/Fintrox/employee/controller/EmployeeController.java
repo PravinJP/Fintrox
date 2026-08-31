@@ -1,7 +1,9 @@
 package com.app.Fintrox.employee.controller;
 
+import com.app.Fintrox.Auth.repository.UserRepository;
 import com.app.Fintrox.employee.dto.request.EmployeeRequest;
 import com.app.Fintrox.employee.dto.response.EmployeeResponse;
+import com.app.Fintrox.employee.repository.EmployeeRepository;
 import com.app.Fintrox.employee.service.EmployeeService;
 import com.app.Fintrox.common.responses.ApiResponse;
 import com.app.Fintrox.common.exceptions.UnauthorizedException;
@@ -25,7 +27,10 @@ public class EmployeeController {
 
     private final EmployeeService employeeService;
 
-    // ===== Employee Management =====
+    private final UserRepository userRepository;
+    private final EmployeeRepository employeeRepository;
+
+
 
     @PostMapping
     public ResponseEntity<ApiResponse<EmployeeResponse>> createEmployee(
@@ -36,6 +41,9 @@ public class EmployeeController {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.success("Employee created successfully", response));
     }
+
+
+
 
     @GetMapping
     public ResponseEntity<ApiResponse<List<EmployeeResponse>>> getAllEmployees() {

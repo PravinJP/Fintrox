@@ -82,4 +82,7 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
     List<Employee> findEmployeesByTarget(@Param("orgId") Long orgId);
 
     boolean existsByOrganizationIdAndUserId(Long organizationId, Long userId);
+
+
+    long countByOrganizationIdAndIsActive(Long organizationId, boolean isActive);
 }

@@ -3,6 +3,7 @@ package com.app.Fintrox.employee.service;
 import com.app.Fintrox.Auth.entity.User;
 import com.app.Fintrox.Auth.repository.UserRepository;
 import com.app.Fintrox.employee.dto.request.EmployeeRequest;
+
 import com.app.Fintrox.employee.dto.response.EmployeeResponse;
 import com.app.Fintrox.employee.entity.Employee;
 import com.app.Fintrox.employee.mapper.EmployeeMapper;
@@ -34,7 +35,6 @@ public class EmployeeServiceImpl implements EmployeeService {
     private final EmployeeRepository employeeRepository;
     private final UserRepository userRepository;
     private final OrganizationRepository organizationRepository;
-    // ✅ REMOVED: routeRepository (temporarily)
     private final EmployeeMapper employeeMapper;
     private final PasswordEncoder passwordEncoder;
     private final RouteRepository routeRepository;
@@ -44,7 +44,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
     @Transactional
     public EmployeeResponse createEmployee(EmployeeRequest request, Long ownerId) {
-        // 1. Validate owner exists
+
         User owner = userRepository.findById(ownerId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
@@ -52,7 +52,7 @@ public class EmployeeServiceImpl implements EmployeeService {
             throw new UnauthorizedException("Only owners can create employees");
         }
 
-        // 2. Get organization
+
         Organization organization = organizationRepository.findByOwnerId(ownerId)
                 .orElseThrow(() -> new BadRequestException("Please create an organization first"));
 
@@ -65,9 +65,9 @@ public class EmployeeServiceImpl implements EmployeeService {
             throw new BadRequestException("Phone number already registered");
         }
 
-        // ✅ REMOVED: Route validation (temporarily)
 
-        // 4. Create User account
+
+
         User user = User.builder()
                 .fullName(request.getFullName())
                 .email(request.getEmail())
@@ -82,7 +82,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
         User savedUser = userRepository.save(user);
 
-        // 5. Create Employee record
+
         Employee employee = employeeMapper.toEntity(request, organization.getId(), ownerId, savedUser.getId());
         Employee savedEmployee = employeeRepository.save(employee);
 
@@ -93,6 +93,8 @@ public class EmployeeServiceImpl implements EmployeeService {
 
         return employeeMapper.toResponseWithOrg(savedEmployee, organization);
     }
+
+
 
     @Override
     public List<EmployeeResponse> getEmployeesByOrganization(Long organizationId) {

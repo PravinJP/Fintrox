@@ -62,8 +62,14 @@ const Employees: React.FC = () => {
 
   useEffect(() => {
     fetchEmployees();
-    fetchStats();
   }, [filters, currentPage]);
+
+  const calculateStats = (employeeData: Employee[]): EmployeeStatsType => {
+    const total = employeeData.length;
+    const active = employeeData.filter((e) => e.isActive).length;
+    const onLeave = total - active;
+    return { total, active, onLeave };
+  };
 
   const fetchEmployees = async () => {
     setLoading(true);
@@ -73,9 +79,11 @@ const Employees: React.FC = () => {
         role: filters.role || undefined,
         status: filters.status || undefined,
       });
-      setEmployees(response.data);
-      setTotalItems(response.data.length);
-      setTotalPages(Math.ceil(response.data.length / 10) || 1);
+      const employeeData = response.data;
+      setEmployees(employeeData);
+      setTotalItems(employeeData.length);
+      setTotalPages(Math.ceil(employeeData.length / 10) || 1);
+      setStats(calculateStats(employeeData));
     } catch (error) {
       notify.error("Failed to fetch employees");
       console.error("Error fetching employees:", error);
@@ -84,18 +92,9 @@ const Employees: React.FC = () => {
     }
   };
 
-  const fetchStats = async () => {
-    try {
-      const response = await employeeApi.getStats();
-      setStats(response.data);
-    } catch (error) {
-      console.error("Error fetching stats:", error);
-    }
-  };
-
   const handleFilterChange = (
     key: keyof EmployeeFiltersType,
-    value: string,
+    value: string
   ) => {
     setFilters((prev) => ({ ...prev, [key]: value }));
     setCurrentPage(1);
@@ -108,11 +107,12 @@ const Employees: React.FC = () => {
   const handleCreate = async (data: CreateEmployeeRequest) => {
     setModalLoading(true);
     try {
-      await employeeApi.create(data);
+      const response = await employeeApi.create(data);
       notify.success("Employee created successfully");
       setIsModalOpen(false);
-      fetchEmployees();
-      fetchStats();
+      const updatedEmployees = [...employees, response.data];
+      setEmployees(updatedEmployees);
+      setStats(calculateStats(updatedEmployees));
     } catch (error: any) {
       const errorMsg =
         error?.response?.data?.message || "Failed to create employee";
@@ -127,12 +127,15 @@ const Employees: React.FC = () => {
     if (!editingEmployee) return;
     setModalLoading(true);
     try {
-      await employeeApi.update(editingEmployee.id, data);
+      const response = await employeeApi.update(editingEmployee.id, data);
       notify.success("Employee updated successfully");
       setIsModalOpen(false);
+      const updatedEmployees = employees.map((e) =>
+        e.id === editingEmployee.id ? response.data : e
+      );
+      setEmployees(updatedEmployees);
+      setStats(calculateStats(updatedEmployees));
       setEditingEmployee(null);
-      fetchEmployees();
-      fetchStats();
     } catch (error: any) {
       const errorMsg =
         error?.response?.data?.message || "Failed to update employee";
@@ -149,8 +152,9 @@ const Employees: React.FC = () => {
     try {
       await employeeApi.delete(id);
       notify.success("Employee deleted successfully");
-      fetchEmployees();
-      fetchStats();
+      const updatedEmployees = employees.filter((e) => e.id !== id);
+      setEmployees(updatedEmployees);
+      setStats(calculateStats(updatedEmployees));
     } catch (error: any) {
       const errorMsg =
         error?.response?.data?.message || "Failed to delete employee";
@@ -163,8 +167,11 @@ const Employees: React.FC = () => {
     try {
       await employeeApi.activate(id);
       notify.success("Employee activated successfully");
-      fetchEmployees();
-      fetchStats();
+      const updatedEmployees = employees.map((e) =>
+        e.id === id ? { ...e, isActive: true } : e
+      );
+      setEmployees(updatedEmployees);
+      setStats(calculateStats(updatedEmployees));
     } catch (error: any) {
       const errorMsg =
         error?.response?.data?.message || "Failed to activate employee";
@@ -177,8 +184,11 @@ const Employees: React.FC = () => {
     try {
       await employeeApi.deactivate(id);
       notify.success("Employee deactivated successfully");
-      fetchEmployees();
-      fetchStats();
+      const updatedEmployees = employees.map((e) =>
+        e.id === id ? { ...e, isActive: false } : e
+      );
+      setEmployees(updatedEmployees);
+      setStats(calculateStats(updatedEmployees));
     } catch (error: any) {
       const errorMsg =
         error?.response?.data?.message || "Failed to deactivate employee";

@@ -40,7 +40,7 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public AuthResponse login(LoginRequest request) {
         try {
-            // Authenticate user
+
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
                             request.getEmail(),
@@ -50,11 +50,11 @@ public class AuthServiceImpl implements AuthService {
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
-            // Get user
+
             User user = userRepository.findByEmail(request.getEmail())
                     .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
-            // Update last login
+
             user.setLastLogin(LocalDateTime.now());
             userRepository.save(user);
 
