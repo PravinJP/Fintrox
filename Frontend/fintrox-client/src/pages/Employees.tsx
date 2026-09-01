@@ -80,10 +80,17 @@ const Employees: React.FC = () => {
         status: filters.status || undefined,
       });
       const employeeData = response.data;
-      setEmployees(employeeData);
-      setTotalItems(employeeData.length);
-      setTotalPages(Math.ceil(employeeData.length / 10) || 1);
-      setStats(calculateStats(employeeData));
+      if (Array.isArray(employeeData)) {
+        setEmployees(employeeData);
+        setTotalItems(employeeData.length);
+        setTotalPages(Math.ceil(employeeData.length / 10) || 1);
+        setStats(calculateStats(employeeData));
+      } else {
+        setEmployees([]);
+        setTotalItems(0);
+        setTotalPages(1);
+        setStats({ total: 0, active: 0, onLeave: 0 });
+      }
     } catch (error) {
       notify.error("Failed to fetch employees");
       console.error("Error fetching employees:", error);

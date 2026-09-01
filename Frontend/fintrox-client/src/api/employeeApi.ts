@@ -89,9 +89,6 @@ export const employeeApi = {
   deactivate: (id: number) =>
     api.patch<void>(`/employees/${id}/deactivate`),
 
-  // : () getStats=>
-  //   api.get<EmployeeStats>('/employees/stats'),
-
   assignRoute: (id: number, routeId: number) =>
     api.patch<Employee>(`/employees/${id}/route`, null, { params: { routeId } }),
 
