@@ -72,34 +72,40 @@ const Employees: React.FC = () => {
   };
 
   const fetchEmployees = async () => {
-    setLoading(true);
-    try {
-      const response = await employeeApi.getAll({
-        search: filters.search || undefined,
-        role: filters.role || undefined,
-        status: filters.status || undefined,
-      });
-      
-      const employeeData = response.data;
-      
-      if (Array.isArray(employeeData)) {
-        setEmployees(employeeData);
-        setTotalItems(employeeData.length);
-        setTotalPages(Math.ceil(employeeData.length / 10) || 1);
-        setStats(calculateStats(employeeData));
-      } else {
-        setEmployees([]);
-        setTotalItems(0);
-        setTotalPages(1);
-        setStats({ total: 0, active: 0, onLeave: 0 });
-      }
-    } catch (error) {
-      notify.error("Failed to fetch employees");
-      console.error("Error fetching employees:", error);
-    } finally {
-      setLoading(false);
+  setLoading(true);
+  try {
+    const response = await employeeApi.getAll({
+      search: filters.search || undefined,
+      role: filters.role || undefined,
+      status: filters.status || undefined,
+    });
+    
+    console.log("📥 API Response:", response);
+    
+    // The employees are in response.data
+    const employeeData = response.data;
+    
+    console.log("📊 Employee Data:", employeeData);
+    console.log("📊 Is Array:", Array.isArray(employeeData));
+    
+    if (Array.isArray(employeeData) && employeeData.length > 0) {
+      setEmployees(employeeData);
+      setTotalItems(employeeData.length);
+      setTotalPages(Math.ceil(employeeData.length / 10) || 1);
+      setStats(calculateStats(employeeData));
+    } else {
+      setEmployees([]);
+      setTotalItems(0);
+      setTotalPages(1);
+      setStats({ total: 0, active: 0, onLeave: 0 });
     }
-  };
+  } catch (error) {
+    console.error("❌ Error fetching employees:", error);
+    notify.error("Failed to fetch employees");
+  } finally {
+    setLoading(false);
+  }
+};
 
   const handleFilterChange = (
     key: keyof EmployeeFiltersType,
