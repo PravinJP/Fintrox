@@ -46,72 +46,100 @@ const Employees: React.FC = () => {
     active: 0,
     onLeave: 0,
   });
+
   const [loading, setLoading] = useState(false);
+
   const [filters, setFilters] = useState<EmployeeFiltersType>({
     search: "",
     role: "",
     status: "",
   });
+
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingEmployee, setEditingEmployee] = useState<Employee | null>(null);
+  const [editingEmployee, setEditingEmployee] =
+    useState<Employee | null>(null);
   const [modalLoading, setModalLoading] = useState(false);
 
   useEffect(() => {
     fetchEmployees();
   }, [filters, currentPage]);
 
-  const calculateStats = (employeeData: Employee[]): EmployeeStatsType => {
+  const calculateStats = (
+    employeeData: Employee[]
+  ): EmployeeStatsType => {
     const total = employeeData.length;
-    const active = employeeData.filter((e) => e.isActive).length;
+    const active = employeeData.filter((e) => e.active).length;
     const onLeave = total - active;
-    return { total, active, onLeave };
+
+    return {
+      total,
+      active,
+      onLeave,
+    };
   };
 
   const fetchEmployees = async () => {
-  setLoading(true);
-  try {
-    const response = await employeeApi.getAll({
-      search: filters.search || undefined,
-      role: filters.role || undefined,
-      status: filters.status || undefined,
-    });
-    
-    console.log("📥 API Response:", response);
-    
-    // The employees are in response.data
-    const employeeData = response.data;
-    
-    console.log("📊 Employee Data:", employeeData);
-    console.log("📊 Is Array:", Array.isArray(employeeData));
-    
-    if (Array.isArray(employeeData) && employeeData.length > 0) {
-      setEmployees(employeeData);
-      setTotalItems(employeeData.length);
-      setTotalPages(Math.ceil(employeeData.length / 10) || 1);
-      setStats(calculateStats(employeeData));
-    } else {
-      setEmployees([]);
-      setTotalItems(0);
-      setTotalPages(1);
-      setStats({ total: 0, active: 0, onLeave: 0 });
+    setLoading(true);
+
+    try {
+      const response = await employeeApi.getAll({
+        search: filters.search || undefined,
+        role: filters.role || undefined,
+        status: filters.status || undefined,
+      });
+
+      console.log("📥 API Response:", response.data);
+
+      const employeeData = response.data.data;
+
+      console.log("📊 Employee Data:", employeeData);
+      console.log(
+        "📊 Is Array:",
+        Array.isArray(employeeData)
+      );
+
+      if (Array.isArray(employeeData)) {
+        setEmployees(employeeData);
+        setTotalItems(employeeData.length);
+        setTotalPages(
+          Math.ceil(employeeData.length / 10) || 1
+        );
+        setStats(calculateStats(employeeData));
+      } else {
+        setEmployees([]);
+        setTotalItems(0);
+        setTotalPages(1);
+        setStats({
+          total: 0,
+          active: 0,
+          onLeave: 0,
+        });
+      }
+    } catch (error) {
+      console.error(
+        "❌ Error fetching employees:",
+        error
+      );
+
+      notify.error("Failed to fetch employees");
+    } finally {
+      setLoading(false);
     }
-  } catch (error) {
-    console.error("❌ Error fetching employees:", error);
-    notify.error("Failed to fetch employees");
-  } finally {
-    setLoading(false);
-  }
-};
+  };
 
   const handleFilterChange = (
     key: keyof EmployeeFiltersType,
     value: string
   ) => {
-    setFilters((prev) => ({ ...prev, [key]: value }));
+    setFilters((prev) => ({
+      ...prev,
+      [key]: value,
+    }));
+
     setCurrentPage(1);
   };
 
@@ -119,96 +147,186 @@ const Employees: React.FC = () => {
     fetchEmployees();
   };
 
-  const handleCreate = async (data: CreateEmployeeRequest) => {
+  const handleCreate = async (
+    data: CreateEmployeeRequest
+  ) => {
     setModalLoading(true);
+
     try {
       const response = await employeeApi.create(data);
+
+      const newEmployee = response.data.data;
+
       notify.success("Employee created successfully");
+
       setIsModalOpen(false);
-      const updatedEmployees = [...employees, response.data];
+
+      const updatedEmployees = [
+        ...employees,
+        newEmployee,
+      ];
+
       setEmployees(updatedEmployees);
+      setTotalItems(updatedEmployees.length);
+      setTotalPages(
+        Math.ceil(updatedEmployees.length / 10) || 1
+      );
       setStats(calculateStats(updatedEmployees));
     } catch (error: any) {
       const errorMsg =
-        error?.response?.data?.message || "Failed to create employee";
+        error?.response?.data?.message ||
+        "Failed to create employee";
+
       notify.error(errorMsg);
-      console.error("Error creating employee:", error);
+
+      console.error(
+        "Error creating employee:",
+        error
+      );
     } finally {
       setModalLoading(false);
     }
   };
 
-  const handleUpdate = async (data: CreateEmployeeRequest) => {
+  const handleUpdate = async (
+    data: CreateEmployeeRequest
+  ) => {
     if (!editingEmployee) return;
+
     setModalLoading(true);
+
     try {
-      const response = await employeeApi.update(editingEmployee.id, data);
-      notify.success("Employee updated successfully");
-      setIsModalOpen(false);
-      const updatedEmployees = employees.map((e) =>
-        e.id === editingEmployee.id ? response.data : e
+      const response = await employeeApi.update(
+        editingEmployee.id,
+        data
       );
+
+      const updatedEmployee = response.data.data;
+
+      notify.success("Employee updated successfully");
+
+      setIsModalOpen(false);
+
+      const updatedEmployees = employees.map((e) =>
+        e.id === editingEmployee.id
+          ? updatedEmployee
+          : e
+      );
+
       setEmployees(updatedEmployees);
       setStats(calculateStats(updatedEmployees));
       setEditingEmployee(null);
     } catch (error: any) {
       const errorMsg =
-        error?.response?.data?.message || "Failed to update employee";
+        error?.response?.data?.message ||
+        "Failed to update employee";
+
       notify.error(errorMsg);
-      console.error("Error updating employee:", error);
+
+      console.error(
+        "Error updating employee:",
+        error
+      );
     } finally {
       setModalLoading(false);
     }
   };
 
   const handleDelete = async (id: number) => {
-    if (!window.confirm("Are you sure you want to delete this employee?"))
+    if (
+      !window.confirm(
+        "Are you sure you want to delete this employee?"
+      )
+    ) {
       return;
+    }
+
     try {
       await employeeApi.delete(id);
+
       notify.success("Employee deleted successfully");
-      const updatedEmployees = employees.filter((e) => e.id !== id);
+
+      const updatedEmployees = employees.filter(
+        (e) => e.id !== id
+      );
+
       setEmployees(updatedEmployees);
+      setTotalItems(updatedEmployees.length);
+      setTotalPages(
+        Math.ceil(updatedEmployees.length / 10) || 1
+      );
       setStats(calculateStats(updatedEmployees));
     } catch (error: any) {
       const errorMsg =
-        error?.response?.data?.message || "Failed to delete employee";
+        error?.response?.data?.message ||
+        "Failed to delete employee";
+
       notify.error(errorMsg);
-      console.error("Error deleting employee:", error);
+
+      console.error(
+        "Error deleting employee:",
+        error
+      );
     }
   };
 
   const handleActivate = async (id: number) => {
     try {
       await employeeApi.activate(id);
-      notify.success("Employee activated successfully");
-      const updatedEmployees = employees.map((e) =>
-        e.id === id ? { ...e, isActive: true } : e
+
+      notify.success(
+        "Employee activated successfully"
       );
+
+      const updatedEmployees = employees.map((e) =>
+        e.id === id
+          ? { ...e, active: true }
+          : e
+      );
+
       setEmployees(updatedEmployees);
       setStats(calculateStats(updatedEmployees));
     } catch (error: any) {
       const errorMsg =
-        error?.response?.data?.message || "Failed to activate employee";
+        error?.response?.data?.message ||
+        "Failed to activate employee";
+
       notify.error(errorMsg);
-      console.error("Error activating employee:", error);
+
+      console.error(
+        "Error activating employee:",
+        error
+      );
     }
   };
 
   const handleDeactivate = async (id: number) => {
     try {
       await employeeApi.deactivate(id);
-      notify.success("Employee deactivated successfully");
-      const updatedEmployees = employees.map((e) =>
-        e.id === id ? { ...e, isActive: false } : e
+
+      notify.success(
+        "Employee deactivated successfully"
       );
+
+      const updatedEmployees = employees.map((e) =>
+        e.id === id
+          ? { ...e, active: false }
+          : e
+      );
+
       setEmployees(updatedEmployees);
       setStats(calculateStats(updatedEmployees));
     } catch (error: any) {
       const errorMsg =
-        error?.response?.data?.message || "Failed to deactivate employee";
+        error?.response?.data?.message ||
+        "Failed to deactivate employee";
+
       notify.error(errorMsg);
-      console.error("Error deactivating employee:", error);
+
+      console.error(
+        "Error deactivating employee:",
+        error
+      );
     }
   };
 
@@ -217,12 +335,20 @@ const Employees: React.FC = () => {
     setIsModalOpen(true);
   };
 
-  const handleAssignRoute = (employee: Employee) => {
-    navigate(`/employees/${employee.id}/assign-route`);
+  const handleAssignRoute = (
+    employee: Employee
+  ) => {
+    navigate(
+      `/employees/${employee.id}/assign-route`
+    );
   };
 
-  const handleSetTarget = (employee: Employee) => {
-    navigate(`/employees/${employee.id}/set-target`);
+  const handleSetTarget = (
+    employee: Employee
+  ) => {
+    navigate(
+      `/employees/${employee.id}/set-target`
+    );
   };
 
   const handleModalClose = () => {
@@ -230,7 +356,9 @@ const Employees: React.FC = () => {
     setEditingEmployee(null);
   };
 
-  const handleModalSave = (data: CreateEmployeeRequest) => {
+  const handleModalSave = (
+    data: CreateEmployeeRequest
+  ) => {
     if (editingEmployee) {
       handleUpdate(data);
     } else {
@@ -245,15 +373,19 @@ const Employees: React.FC = () => {
           <h1 className="font-headline-lg text-headline-lg text-on-background mb-1">
             Employees
           </h1>
+
           <p className="font-body-md text-on-surface-variant">
             Manage your workforce, roles, and access.
           </p>
         </div>
+
         <button
           className="bg-[#2D6A4F] text-white px-4 py-2 rounded-lg font-label-md flex items-center gap-2 hover:bg-primary transition-colors shadow-sm"
           onClick={() => setIsModalOpen(true)}
         >
-          <span className="material-symbols-outlined text-sm">add</span>
+          <span className="material-symbols-outlined text-sm">
+            add
+          </span>
           Add Employee
         </button>
       </div>
@@ -264,7 +396,10 @@ const Employees: React.FC = () => {
         onSearch={handleSearch}
       />
 
-      <EmployeeStats stats={stats} loading={loading} />
+      <EmployeeStats
+        stats={stats}
+        loading={loading}
+      />
 
       <EmployeeList
         employees={employees}
