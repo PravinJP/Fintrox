@@ -47,11 +47,43 @@ public class EmployeeController {
 
     @GetMapping
     public ResponseEntity<ApiResponse<List<EmployeeResponse>>> getAllEmployees() {
-        List<EmployeeResponse> responses = employeeService.getEmployeesByOrganization(1L);
-        return ResponseEntity.ok(ApiResponse.success("Employees fetched successfully", responses));
+        Long organizationId = getCurrentOrganizationId();
+
+        log.info("Fetching employees for organization: {}", organizationId);
+
+        List<EmployeeResponse> responses =
+                employeeService.getEmployeesByOrganization(organizationId);
+
+        return ResponseEntity.ok(
+                ApiResponse.success("Employees fetched successfully", responses)
+        );
     }
 
-    // ✅ FIXED: @PathVariable("id") with parameter name
+    private Long getCurrentOrganizationId() {
+        Authentication authentication =
+                SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new UnauthorizedException("User not authenticated");
+        }
+
+        Object principal = authentication.getPrincipal();
+
+        if (principal instanceof com.app.Fintrox.Auth.entity.User user) {
+
+            if (user.getOrganizationId() == null) {
+                throw new UnauthorizedException(
+                        "User is not associated with an organization"
+                );
+            }
+
+            return user.getOrganizationId();
+        }
+
+        throw new UnauthorizedException("User not properly authenticated");
+    }
+
+
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<EmployeeResponse>> getEmployee(
             @PathVariable("id") Long id) {
@@ -136,7 +168,7 @@ public class EmployeeController {
 
     // ===== Search =====
 
-    // ✅ FIXED: @RequestParam("query") with parameter name
+
     @GetMapping("/search")
     public ResponseEntity<ApiResponse<List<EmployeeResponse>>> searchEmployees(
             @RequestParam("query") String query,
