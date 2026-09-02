@@ -79,7 +79,9 @@ const Employees: React.FC = () => {
         role: filters.role || undefined,
         status: filters.status || undefined,
       });
-      const employeeData = response.data.data;
+      
+      const employeeData = response.data;
+      
       if (Array.isArray(employeeData)) {
         setEmployees(employeeData);
         setTotalItems(employeeData.length);
