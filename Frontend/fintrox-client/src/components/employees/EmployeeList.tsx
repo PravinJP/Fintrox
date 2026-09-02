@@ -48,6 +48,7 @@ const EmployeeList: React.FC<EmployeeListProps> = ({
       FIELD_MANAGER: 'Field Manager',
       BRANCH_MANAGER: 'Branch Manager',
     };
+
     return roleMap[role] || role;
   };
 
@@ -68,14 +69,27 @@ const EmployeeList: React.FC<EmployeeListProps> = ({
         <table className="w-full text-left border-collapse">
           <thead>
             <tr className="bg-surface-container-low border-b border-surface-variant">
-              <th className="font-label-caps text-label-caps text-on-surface-variant py-3 px-6">Code</th>
-              <th className="font-label-caps text-label-caps text-on-surface-variant py-3 px-6">Name</th>
-              <th className="font-label-caps text-label-caps text-on-surface-variant py-3 px-6">Role</th>
-              <th className="font-label-caps text-label-caps text-on-surface-variant py-3 px-6">Status</th>
-              <th className="font-label-caps text-label-caps text-on-surface-variant py-3 px-6">Target</th>
-              <th className="font-label-caps text-label-caps text-on-surface-variant py-3 px-6 text-right">Actions</th>
+              <th className="font-label-caps text-label-caps text-on-surface-variant py-3 px-6">
+                Code
+              </th>
+              <th className="font-label-caps text-label-caps text-on-surface-variant py-3 px-6">
+                Name
+              </th>
+              <th className="font-label-caps text-label-caps text-on-surface-variant py-3 px-6">
+                Role
+              </th>
+              <th className="font-label-caps text-label-caps text-on-surface-variant py-3 px-6">
+                Status
+              </th>
+              <th className="font-label-caps text-label-caps text-on-surface-variant py-3 px-6">
+                Target
+              </th>
+              <th className="font-label-caps text-label-caps text-on-surface-variant py-3 px-6 text-right">
+                Actions
+              </th>
             </tr>
           </thead>
+
           <tbody className="font-body-md text-on-surface">
             {employees.map((employee, index) => (
               <tr
@@ -87,17 +101,31 @@ const EmployeeList: React.FC<EmployeeListProps> = ({
                 <td className="py-4 px-6 text-on-surface-variant">
                   {employee.employeeCode}
                 </td>
-                <td className="py-4 px-6 font-medium">{employee.fullName}</td>
-                <td className="py-4 px-6 text-on-surface-variant">{getRoleDisplay(employee.role)}</td>
-                <td className="py-4 px-6">{getStatusBadge(employee.isActive)}</td>
+
+                <td className="py-4 px-6 font-medium">
+                  {employee.fullName}
+                </td>
+
+                <td className="py-4 px-6 text-on-surface-variant">
+                  {getRoleDisplay(employee.role)}
+                </td>
+
+                <td className="py-4 px-6">
+                  {getStatusBadge(employee.active)}
+                </td>
+
                 <td className="py-4 px-6">
                   <div className="text-sm">
-                    <div className="text-on-surface-variant">₹{employee.monthlyTarget?.toLocaleString() || 0}</div>
+                    <div className="text-on-surface-variant">
+                      ₹{employee.monthlyTarget?.toLocaleString() || 0}
+                    </div>
+
                     <div className="text-xs text-on-surface-variant/60">
                       {employee.targetAchievementPercentage?.toFixed(1) || 0}% achieved
                     </div>
                   </div>
                 </td>
+
                 <td className="py-4 px-6 text-right">
                   <div className="flex justify-end gap-1">
                     <button
@@ -105,15 +133,20 @@ const EmployeeList: React.FC<EmployeeListProps> = ({
                       className="text-outline hover:text-primary transition-colors p-1"
                       title="Edit"
                     >
-                      <span className="material-symbols-outlined text-[20px]">edit</span>
+                      <span className="material-symbols-outlined text-[20px]">
+                        edit
+                      </span>
                     </button>
-                    {employee.isActive ? (
+
+                    {employee.active ? (
                       <button
                         onClick={() => onDeactivate(employee.id)}
                         className="text-outline hover:text-warning transition-colors p-1"
                         title="Deactivate"
                       >
-                        <span className="material-symbols-outlined text-[20px]">pause</span>
+                        <span className="material-symbols-outlined text-[20px]">
+                          pause
+                        </span>
                       </button>
                     ) : (
                       <button
@@ -121,37 +154,52 @@ const EmployeeList: React.FC<EmployeeListProps> = ({
                         className="text-outline hover:text-success transition-colors p-1"
                         title="Activate"
                       >
-                        <span className="material-symbols-outlined text-[20px]">play_arrow</span>
+                        <span className="material-symbols-outlined text-[20px]">
+                          play_arrow
+                        </span>
                       </button>
                     )}
+
                     <button
                       onClick={() => onAssignRoute(employee)}
                       className="text-outline hover:text-primary transition-colors p-1"
                       title="Assign Route"
                     >
-                      <span className="material-symbols-outlined text-[20px]">route</span>
+                      <span className="material-symbols-outlined text-[20px]">
+                        route
+                      </span>
                     </button>
+
                     <button
                       onClick={() => onSetTarget(employee)}
                       className="text-outline hover:text-primary transition-colors p-1"
                       title="Set Target"
                     >
-                      <span className="material-symbols-outlined text-[20px]">payments</span>
+                      <span className="material-symbols-outlined text-[20px]">
+                        payments
+                      </span>
                     </button>
+
                     <button
                       onClick={() => onDelete(employee.id)}
                       className="text-outline hover:text-error transition-colors p-1"
                       title="Delete"
                     >
-                      <span className="material-symbols-outlined text-[20px]">delete</span>
+                      <span className="material-symbols-outlined text-[20px]">
+                        delete
+                      </span>
                     </button>
                   </div>
                 </td>
               </tr>
             ))}
+
             {employees.length === 0 && (
               <tr>
-                <td colSpan={6} className="py-8 text-center text-on-surface-variant">
+                <td
+                  colSpan={6}
+                  className="py-8 text-center text-on-surface-variant"
+                >
                   No employees found. Add your first employee!
                 </td>
               </tr>
@@ -163,8 +211,10 @@ const EmployeeList: React.FC<EmployeeListProps> = ({
       {totalPages > 0 && (
         <div className="px-6 py-4 flex items-center justify-between border-t border-surface-variant bg-surface-container-lowest">
           <span className="font-body-md text-on-surface-variant">
-            Showing 1 to {employees.length} of {totalItems} entries
+            Showing {employees.length > 0 ? 1 : 0} to {employees.length} of{' '}
+            {totalItems} entries
           </span>
+
           <div className="flex gap-2">
             <button
               className="px-3 py-1 border border-outline-variant rounded hover:bg-surface-container text-on-surface-variant transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
@@ -173,7 +223,13 @@ const EmployeeList: React.FC<EmployeeListProps> = ({
             >
               Prev
             </button>
-            {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => i + Math.max(1, currentPage - 2))
+
+            {Array.from(
+              {
+                length: Math.min(totalPages, 5),
+              },
+              (_, i) => i + Math.max(1, currentPage - 2)
+            )
               .filter((page) => page <= totalPages)
               .map((page) => (
                 <button
@@ -188,6 +244,7 @@ const EmployeeList: React.FC<EmployeeListProps> = ({
                   {page}
                 </button>
               ))}
+
             <button
               className="px-3 py-1 border border-outline-variant rounded hover:bg-surface-container text-on-surface-variant transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               disabled={currentPage === totalPages}
