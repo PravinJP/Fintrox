@@ -67,35 +67,28 @@ public class JwtTokenProvider {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + expiration);
 
-        // ✅ FIXED: Use the recommended method for JJWT 0.12.x
         SecretKey key = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
 
         return Jwts.builder()
-                .claims(claims)  // ✅ FIXED: Use .claims() instead of .setClaims()
-                .subject(subject)  // ✅ FIXED: Use .subject() instead of .setSubject()
-                .issuedAt(now)  // ✅ FIXED: Use .issuedAt() instead of .setIssuedAt()
-                .expiration(expiryDate)  // ✅ FIXED: Use .expiration() instead of .setExpiration()
+                .claims(claims)
+                .subject(subject)
+                .issuedAt(now)
+                .expiration(expiryDate)
                 .signWith(key)
                 .compact();
     }
 
-    /**
-     * Get email/username from token
-     */
+
     public String getEmailFromToken(String token) {
         return getClaimFromToken(token, Claims::getSubject);
     }
 
-    /**
-     * Get expiration date from token
-     */
+
     public Date getExpirationDateFromToken(String token) {
         return getClaimFromToken(token, Claims::getExpiration);
     }
 
-    /**
-     * Get claim from token
-     */
+
     public <T> T getClaimFromToken(String token, Function<Claims, T> claimsResolver) {
         final Claims claims = getAllClaimsFromToken(token);
         return claimsResolver.apply(claims);
