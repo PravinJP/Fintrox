@@ -112,12 +112,11 @@ public class EmployeeServiceImpl implements EmployeeService {
                 .collect(Collectors.toList());
     }
 
-    @Override
-    public EmployeeResponse getEmployeeById(Long id) {
-        Employee employee = employeeRepository.findById(id)
+
+    public EmployeeResponse getEmployeeById(Long id, Long organizationId) {
+        Employee employee = employeeRepository.findByIdAndOrganizationId(id, organizationId)
                 .orElseThrow(() -> new ResourceNotFoundException("Employee not found"));
 
-        // ✅ Fetch route if routeId exists
         String routeName = null;
         if (employee.getRouteId() != null) {
             Route route = routeRepository.findById(employee.getRouteId()).orElse(null);
@@ -127,10 +126,9 @@ public class EmployeeServiceImpl implements EmployeeService {
         }
 
         EmployeeResponse response = employeeMapper.toResponse(employee);
-        response.setRouteName(routeName);  // ✅ Set route name
+        response.setRouteName(routeName);
         return response;
     }
-
     @Override
     public Employee getEmployeeByUserId(Long userId) {
         return employeeRepository.findByUserId(userId)

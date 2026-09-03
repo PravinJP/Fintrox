@@ -85,7 +85,6 @@ public class EmployeeController {
 
         EmployeeResponse response =
                 employeeService.getEmployeeById(id, organizationId);
-
         return ResponseEntity.ok(
                 ApiResponse.success(
                         "Employee details fetched",

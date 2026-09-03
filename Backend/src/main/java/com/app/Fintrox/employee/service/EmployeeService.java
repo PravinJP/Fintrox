@@ -29,7 +29,7 @@ public interface EmployeeService {
     /**
      * Get employee by ID
      */
-    EmployeeResponse getEmployeeById(Long id);
+    EmployeeResponse getEmployeeById(Long id,Long organizationId);
 
     /**
      * Get employee by user ID
