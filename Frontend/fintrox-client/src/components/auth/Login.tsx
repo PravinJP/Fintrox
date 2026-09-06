@@ -20,12 +20,14 @@ const Login: React.FC = () => {
       const result = await dispatch(login({ email, password })).unwrap();
       console.log('✅ Login successful:', result);
       
-      // ✅ Check if user has organization
-      if (result.organizationId) {
-        navigate('/dashboard');
-      } else {
-        navigate('/settings/organization');
-      }
+      
+      if (result.userType === 'EMPLOYEE') {
+    navigate('/employee/dashboard');
+} else if (result.organizationId) {
+    navigate('/dashboard');
+} else {
+    navigate('/settings/organization');
+}
       
     } catch (err: any) {
       console.error('❌ Login error:', err);
