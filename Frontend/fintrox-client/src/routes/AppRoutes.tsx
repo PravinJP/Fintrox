@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
@@ -10,6 +11,7 @@ import ProtectedRoute from './ProtectedRoute';
 import Login from '../components/auth/Login';
 import Register from '../components/auth/Register';
 import Employees from '../pages/Employees';
+import RoutesPage from '../pages/Routes';
 
 const AppRoutes: React.FC = () => {
   const { isAuthenticated, loading } = useSelector((state: RootState) => state.auth);
@@ -37,6 +39,7 @@ const AppRoutes: React.FC = () => {
         <Route element={<DashboardLayout />}>
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/employees" element={<Employees />} />
+          <Route path="/routes" element={<RoutesPage />} />
         </Route>
       </Route>
       
