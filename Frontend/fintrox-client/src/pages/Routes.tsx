@@ -44,21 +44,28 @@ const RoutesPage: React.FC = () => {
   };
 
   const fetchRoutes = async () => {
-    setLoading(true);
-    try {
-      const response = await routeApi.getAll();
-      const routeData = response.data;
+  setLoading(true);
+  try {
+    const response = await routeApi.getAll();
+    const routeData = response.data.data || response.data;
+    
+    if (Array.isArray(routeData)) {
       setRoutes(routeData);
       setStats(calculateStats(routeData));
       if (routeData.length > 0 && !selectedRoute) {
         setSelectedRoute(routeData[0]);
       }
-    } catch (error) {
-      console.error('Error fetching routes:', error);
-    } finally {
-      setLoading(false);
+    } else {
+      console.error('Expected array but got:', routeData);
+      setRoutes([]);
+      setStats({ total: 0, active: 0, inactive: 0, assigned: 0 });
     }
-  };
+  } catch (error) {
+    console.error('Error fetching routes:', error);
+  } finally {
+    setLoading(false);
+  }
+};
 
   const fetchEmployees = async () => {
     try {
