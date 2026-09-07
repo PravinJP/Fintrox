@@ -63,7 +63,7 @@ const RoutesPage: React.FC = () => {
   const fetchEmployees = async () => {
     try {
       const response = await employeeApi.getAll();
-      setEmployees(response.data);
+      setEmployees(response.data.data);
     } catch (error) {
       console.error('Error fetching employees:', error);
     }
@@ -160,20 +160,8 @@ const RoutesPage: React.FC = () => {
     setIsModalOpen(true);
   };
 
-  const openEditModal = (route: Route) => {
-    setEditingRoute(route);
-    setIsModalOpen(true);
-  };
 
-  const openAssignModal = (route: Route) => {
-    setSelectedRoute(route);
-    setIsAssignModalOpen(true);
-  };
 
-  const openDeleteModal = (route: Route) => {
-    setDeletingRoute(route);
-    setIsDeleteModalOpen(true);
-  };
 
   return (
     <div className="flex-1 overflow-y-auto p-8 space-y-6">
