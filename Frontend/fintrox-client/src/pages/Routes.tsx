@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import employeeApi, { type Employee } from '../api/employeeApi';
-import routeApi, { type Route, type CreateRouteRequest,type RouteStats as RouteStatsType } from '../api/routeApi';
+import routeApi, {type Route,type CreateRouteRequest,type RouteStats as RouteStatsType } from '../api/routeApi';
 import RouteAssignModal from '../components/routes/RouteAssignModal';
 import RouteDeleteDialog from '../components/routes/RouteDeleteDialog';
 import RouteFilters from '../components/routes/RouteFilters';
@@ -8,6 +8,7 @@ import RouteList from '../components/routes/RouteList';
 import RouteMap from '../components/routes/RouteMap';
 import RouteModal from '../components/routes/RouteModal';
 import RouteStats from '../components/routes/RouteStats';
+
 
 const RoutesPage: React.FC = () => {
   const [routes, setRoutes] = useState<Route[]>([]);
@@ -44,28 +45,27 @@ const RoutesPage: React.FC = () => {
   };
 
   const fetchRoutes = async () => {
-  setLoading(true);
-  try {
-    const response = await routeApi.getAll();
-    const routeData = response.data.data || response.data;
-    
-    if (Array.isArray(routeData)) {
-      setRoutes(routeData);
-      setStats(calculateStats(routeData));
-      if (routeData.length > 0 && !selectedRoute) {
-        setSelectedRoute(routeData[0]);
+    setLoading(true);
+    try {
+      const response = await routeApi.getAll();
+      const routeData = response.data.data;
+      if (Array.isArray(routeData)) {
+        setRoutes(routeData);
+        setStats(calculateStats(routeData));
+        if (routeData.length > 0 && !selectedRoute) {
+          setSelectedRoute(routeData[0]);
+        }
+      } else {
+        console.error('Expected array but got:', routeData);
+        setRoutes([]);
+        setStats({ total: 0, active: 0, inactive: 0, assigned: 0 });
       }
-    } else {
-      console.error('Expected array but got:', routeData);
-      setRoutes([]);
-      setStats({ total: 0, active: 0, inactive: 0, assigned: 0 });
+    } catch (error) {
+      console.error('Error fetching routes:', error);
+    } finally {
+      setLoading(false);
     }
-  } catch (error) {
-    console.error('Error fetching routes:', error);
-  } finally {
-    setLoading(false);
-  }
-};
+  };
 
   const fetchEmployees = async () => {
     try {
@@ -80,7 +80,8 @@ const RoutesPage: React.FC = () => {
     setModalLoading(true);
     try {
       const response = await routeApi.create(data);
-      const updatedRoutes = [...routes, response.data];
+      const newRoute = response.data.data;
+      const updatedRoutes = [...routes, newRoute];
       setRoutes(updatedRoutes);
       setStats(calculateStats(updatedRoutes));
       setIsModalOpen(false);
@@ -95,7 +96,8 @@ const RoutesPage: React.FC = () => {
     setModalLoading(true);
     try {
       const response = await routeApi.update(id, data);
-      const updatedRoutes = routes.map((r) => (r.id === id ? response.data : r));
+      const updatedRoute = response.data.data;
+      const updatedRoutes = routes.map((r) => (r.id === id ? updatedRoute : r));
       setRoutes(updatedRoutes);
       setStats(calculateStats(updatedRoutes));
       setIsModalOpen(false);
@@ -132,11 +134,12 @@ const RoutesPage: React.FC = () => {
     setModalLoading(true);
     try {
       const response = await routeApi.assignEmployee(selectedRoute.id, employeeId);
-      const updatedRoutes = routes.map((r) => (r.id === selectedRoute.id ? response.data : r));
+      const updatedRoute = response.data.data;
+      const updatedRoutes = routes.map((r) => (r.id === selectedRoute.id ? updatedRoute : r));
       setRoutes(updatedRoutes);
       setStats(calculateStats(updatedRoutes));
       setIsAssignModalOpen(false);
-      setSelectedRoute(response.data);
+      setSelectedRoute(updatedRoute);
     } catch (error: any) {
       console.error('Error assigning employee:', error);
     } finally {
@@ -167,8 +170,20 @@ const RoutesPage: React.FC = () => {
     setIsModalOpen(true);
   };
 
+  const openEditModal = (route: Route) => {
+    setEditingRoute(route);
+    setIsModalOpen(true);
+  };
 
+  const openAssignModal = (route: Route) => {
+    setSelectedRoute(route);
+    setIsAssignModalOpen(true);
+  };
 
+  const openDeleteModal = (route: Route) => {
+    setDeletingRoute(route);
+    setIsDeleteModalOpen(true);
+  };
 
   return (
     <div className="flex-1 overflow-y-auto p-8 space-y-6">
