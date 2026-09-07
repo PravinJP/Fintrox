@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { Route } from '../../api/routeApi';
+import type { Route } from '../../api/routeApi';
 
 interface RouteMapProps {
   route: Route | null;

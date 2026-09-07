@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Route, CreateRouteRequest, Employee } from '../../api/routeApi';
+import type { Route, CreateRouteRequest } from '../../api/routeApi';
+import type { Employee } from '../../api/employeeApi';
+
 
 interface RouteModalProps {
   isOpen: boolean;

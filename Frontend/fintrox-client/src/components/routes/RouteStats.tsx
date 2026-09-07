@@ -1,5 +1,5 @@
 import React from 'react';
-import { RouteStats as RouteStatsType } from '../../api/routeApi';
+import type { RouteStats as RouteStatsType } from '../../api/routeApi';
 
 interface RouteStatsProps {
   stats: RouteStatsType;

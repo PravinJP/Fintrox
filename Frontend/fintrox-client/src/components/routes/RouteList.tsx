@@ -1,5 +1,5 @@
 import React from 'react';
-import { Route } from '../../api/routeApi';
+import { type Route } from '../../api/routeApi';
 
 interface RouteListProps {
   routes: Route[];
