@@ -1,14 +1,17 @@
-import React, { useState, useEffect } from 'react';
-import employeeApi, { type Employee } from '../api/employeeApi';
-import routeApi, { type Route, type CreateRouteRequest,type RouteStats as RouteStatsType } from '../api/routeApi';
-import RouteAssignModal from '../components/routes/RouteAssignModal';
-import RouteDeleteDialog from '../components/routes/RouteDeleteDialog';
-import RouteFilters from '../components/routes/RouteFilters';
-import RouteList from '../components/routes/RouteList';
-import RouteMap from '../components/routes/RouteMap';
-import RouteModal from '../components/routes/RouteModal';
-import RouteStats from '../components/routes/RouteStats';
-
+import React, { useState, useEffect } from "react";
+import employeeApi, { type Employee } from "../api/employeeApi";
+import routeApi, {
+  type Route,
+  type CreateRouteRequest,
+  type RouteStats as RouteStatsType,
+} from "../api/routeApi";
+import RouteAssignModal from "../components/routes/RouteAssignModal";
+import RouteDeleteDialog from "../components/routes/RouteDeleteDialog";
+import RouteFilters from "../components/routes/RouteFilters";
+import RouteList from "../components/routes/RouteList";
+import RouteMap from "../components/routes/RouteMap";
+import RouteModal from "../components/routes/RouteModal";
+import RouteStats from "../components/routes/RouteStats";
 
 const RoutesPage: React.FC = () => {
   const [routes, setRoutes] = useState<Route[]>([]);
@@ -21,8 +24,10 @@ const RoutesPage: React.FC = () => {
     inactive: 0,
     assigned: 0,
   });
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filterStatus, setFilterStatus] = useState<'all' | 'active' | 'inactive'>('all');
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filterStatus, setFilterStatus] = useState<
+    "all" | "active" | "inactive"
+  >("all");
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
@@ -46,7 +51,7 @@ const RoutesPage: React.FC = () => {
         setSelectedRoute(response.data[0]);
       }
     } catch (error) {
-      console.error('Error fetching routes:', error);
+      console.error("Error fetching routes:", error);
     } finally {
       setLoading(false);
     }
@@ -55,9 +60,9 @@ const RoutesPage: React.FC = () => {
   const fetchEmployees = async () => {
     try {
       const response = await employeeApi.getAll();
-      setEmployees(response.data);
+      setEmployees(response.data.data);
     } catch (error) {
-      console.error('Error fetching employees:', error);
+      console.error("Error fetching employees:", error);
     }
   };
 
@@ -66,7 +71,7 @@ const RoutesPage: React.FC = () => {
       const response = await routeApi.getStats();
       setStats(response.data);
     } catch (error) {
-      console.error('Error fetching stats:', error);
+      console.error("Error fetching stats:", error);
     }
   };
 
@@ -87,7 +92,7 @@ const RoutesPage: React.FC = () => {
       setStats(calculateStats(updatedRoutes));
       setIsModalOpen(false);
     } catch (error: any) {
-      console.error('Error creating route:', error);
+      console.error("Error creating route:", error);
     } finally {
       setModalLoading(false);
     }
@@ -97,13 +102,15 @@ const RoutesPage: React.FC = () => {
     setModalLoading(true);
     try {
       const response = await routeApi.update(id, data);
-      const updatedRoutes = routes.map((r) => (r.id === id ? response.data : r));
+      const updatedRoutes = routes.map((r) =>
+        r.id === id ? response.data : r,
+      );
       setRoutes(updatedRoutes);
       setStats(calculateStats(updatedRoutes));
       setIsModalOpen(false);
       setEditingRoute(null);
     } catch (error: any) {
-      console.error('Error updating route:', error);
+      console.error("Error updating route:", error);
     } finally {
       setModalLoading(false);
     }
@@ -123,7 +130,7 @@ const RoutesPage: React.FC = () => {
         setSelectedRoute(updatedRoutes[0] || null);
       }
     } catch (error: any) {
-      console.error('Error deleting route:', error);
+      console.error("Error deleting route:", error);
     } finally {
       setModalLoading(false);
     }
@@ -133,14 +140,19 @@ const RoutesPage: React.FC = () => {
     if (!selectedRoute) return;
     setModalLoading(true);
     try {
-      const response = await routeApi.assignEmployee(selectedRoute.id, employeeId);
-      const updatedRoutes = routes.map((r) => (r.id === selectedRoute.id ? response.data : r));
+      const response = await routeApi.assignEmployee(
+        selectedRoute.id,
+        employeeId,
+      );
+      const updatedRoutes = routes.map((r) =>
+        r.id === selectedRoute.id ? response.data : r,
+      );
       setRoutes(updatedRoutes);
       setStats(calculateStats(updatedRoutes));
       setIsAssignModalOpen(false);
       setSelectedRoute(response.data);
     } catch (error: any) {
-      console.error('Error assigning employee:', error);
+      console.error("Error assigning employee:", error);
     } finally {
       setModalLoading(false);
     }
@@ -155,12 +167,14 @@ const RoutesPage: React.FC = () => {
   };
 
   const filteredRoutes = routes.filter((route) => {
-    const matchesSearch = route.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    const matchesSearch =
+      route.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       route.area?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       route.city?.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = filterStatus === 'all' ||
-      (filterStatus === 'active' && route.isActive) ||
-      (filterStatus === 'inactive' && !route.isActive);
+    const matchesStatus =
+      filterStatus === "all" ||
+      (filterStatus === "active" && route.isActive) ||
+      (filterStatus === "inactive" && !route.isActive);
     return matchesSearch && matchesStatus;
   });
 
@@ -169,22 +183,31 @@ const RoutesPage: React.FC = () => {
     setIsModalOpen(true);
   };
 
-
-
-
   return (
     <div className="flex-1 overflow-y-auto p-8 space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-slate-900">Routes</h1>
-          <p className="text-sm text-slate-500">Manage collection routes and assign employees</p>
+          <p className="text-sm text-slate-500">
+            Manage collection routes and assign employees
+          </p>
         </div>
         <button
           className="inline-flex items-center px-4 py-2 bg-primary hover:bg-primary-dark text-white text-sm font-semibold rounded-xl shadow-sm shadow-primary/30 transition-all"
           onClick={openCreateModal}
         >
-          <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path d="M12 4v16m8-8H4" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
+          <svg
+            className="w-4 h-4 mr-2"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              d="M12 4v16m8-8H4"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+            />
           </svg>
           Create Route
         </button>
@@ -215,7 +238,10 @@ const RoutesPage: React.FC = () => {
 
       <RouteModal
         isOpen={isModalOpen}
-        onClose={() => { setIsModalOpen(false); setEditingRoute(null); }}
+        onClose={() => {
+          setIsModalOpen(false);
+          setEditingRoute(null);
+        }}
         onSave={handleModalSave}
         route={editingRoute}
         employees={employees}
@@ -233,9 +259,12 @@ const RoutesPage: React.FC = () => {
 
       <RouteDeleteDialog
         isOpen={isDeleteModalOpen}
-        onClose={() => { setIsDeleteModalOpen(false); setDeletingRoute(null); }}
+        onClose={() => {
+          setIsDeleteModalOpen(false);
+          setDeletingRoute(null);
+        }}
         onConfirm={handleDelete}
-        routeName={deletingRoute?.name || ''}
+        routeName={deletingRoute?.name || ""}
         loading={modalLoading}
       />
     </div>
