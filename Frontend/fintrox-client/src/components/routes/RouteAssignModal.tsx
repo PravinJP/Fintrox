@@ -70,7 +70,7 @@ const RouteAssignModal: React.FC<RouteAssignModalProps> = ({
                 </div>
                 <div>
                   <p className="text-sm font-semibold text-slate-800">{emp.fullName}</p>
-                  <p className="text-xs text-slate-500">{emp.role} • {emp.isActive ? 'Active' : 'Inactive'}</p>
+                  <p className="text-xs text-slate-500">{emp.role} • {emp.active ? 'Active' : 'Inactive'}</p>
                 </div>
               </label>
             ))}
