@@ -79,8 +79,7 @@ export const routeApi = {
   getMyRoutes: () =>
     api.get<Route[]>('/routes/my-routes'),
 
-  getStats: () =>
-    api.get<RouteStats>('/routes/stats'),
+
 
   search: (query: string) =>
     api.get<Route[]>('/routes/search', { params: { query } }),
