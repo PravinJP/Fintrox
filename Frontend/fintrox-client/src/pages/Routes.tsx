@@ -193,8 +193,8 @@ const RoutesPage: React.FC = () => {
 
       <RouteStats stats={stats} loading={loading} />
 
-      <section className="grid grid-cols-1 lg:grid-cols-5 gap-6 h-[calc(100vh-400px)]">
-        <div className="lg:col-span-2 bg-white rounded-[12px] border border-slate-200 shadow-sm flex flex-col overflow-hidden">
+          <section className="grid grid-cols-1 lg:grid-cols-5 gap-6 h-[600px]">
+          <div className="lg:col-span-2 bg-white rounded-[12px] border border-slate-200 shadow-sm flex flex-col overflow-hidden">
           <RouteFilters
             searchTerm={searchTerm}
             onSearchChange={setSearchTerm}

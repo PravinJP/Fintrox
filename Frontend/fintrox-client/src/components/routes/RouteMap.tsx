@@ -1,40 +1,100 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
+import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
 import type { Route } from '../../api/routeApi';
 
 interface RouteMapProps {
   route: Route | null;
 }
 
+const defaultCenter: [number, number] = [12.9716, 77.5946];
+
+const MapController: React.FC<{ center: [number, number]; zoom?: number }> = ({ center, zoom = 13 }) => {
+  const map = useMap();
+  useEffect(() => {
+    map.setView(center, zoom);
+  }, [center, zoom, map]);
+  return null;
+};
+
 const RouteMap: React.FC<RouteMapProps> = ({ route }) => {
-  const mapRef = useRef<HTMLDivElement>(null);
+  const [coordinates, setCoordinates] = useState<[number, number]>(defaultCenter);
 
   useEffect(() => {
-    if (route && mapRef.current) {
-      
-      console.log('Map would render for route:', route.name);
-    }
+    if (!route) return;
+
+    const fetchCoordinates = async () => {
+      const addressParts = [
+        route.area,
+        route.city,
+        route.state,
+        route.pincode,
+      ].filter(Boolean);
+
+      if (addressParts.length === 0) {
+        setCoordinates(defaultCenter);
+        return;
+      }
+
+      const query = encodeURIComponent(addressParts.join(', '));
+      console.log('🔍 Geocoding address:', query);
+
+      try {
+        const response = await fetch(
+          `https://nominatim.openstreetmap.org/search?format=json&q=${query}`
+        );
+        const data = await response.json();
+        console.log('📍 Geocoding result:', data);
+
+        if (data && data.length > 0) {
+          setCoordinates([parseFloat(data[0].lat), parseFloat(data[0].lon)]);
+        } else {
+          setCoordinates(defaultCenter);
+        }
+      } catch (error) {
+        console.error('Geocoding error:', error);
+        setCoordinates(defaultCenter);
+      }
+    };
+
+    fetchCoordinates();
   }, [route]);
 
+  const customIcon = L.divIcon({
+    className: 'custom-marker-icon',
+    html: `<div style="background-color: #2D6A4F; width: 20px; height: 20px; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 6px rgba(0,0,0,0.3);"></div>`,
+    iconSize: [20, 20],
+    iconAnchor: [10, 10],
+  });
+
   return (
-    <div className="flex-1 relative bg-slate-100">
-      <div ref={mapRef} className="absolute inset-0 w-full h-full z-0" id="leafletMap">
-        <div className="flex items-center justify-center h-full">
-          <div className="text-center text-slate-400">
-            <svg className="w-16 h-16 mx-auto mb-4 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
-            </svg>
-            <p className="text-sm font-medium">Map View</p>
-            <p className="text-xs">Select a route to view its location</p>
-            {route && (
-              <div className="mt-4 text-left max-w-sm mx-auto">
-                <p className="text-sm font-semibold">{route.name}</p>
-                <p className="text-xs text-slate-500">{route.area}</p>
-                <p className="text-xs text-slate-500">{route.city}, {route.state}</p>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
+    <div style={{ height: '100%', width: '100%', minHeight: '500px' }}>
+      <MapContainer
+        center={coordinates}
+        zoom={13}
+        style={{ height: '100%', width: '100%', minHeight: '500px' }}
+        scrollWheelZoom={true}
+      >
+        <TileLayer
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        />
+        <MapController center={coordinates} />
+        <Marker position={coordinates} icon={customIcon}>
+          <Popup>
+            <div>
+              <p style={{ fontWeight: 'bold' }}>{route?.name || 'Route Location'}</p>
+              {route?.area && <p style={{ fontSize: '12px', color: '#666' }}>{route.area}</p>}
+              {route?.city && (
+                <p style={{ fontSize: '12px', color: '#666' }}>
+                  {route.city}, {route.state}
+                </p>
+              )}
+            </div>
+          </Popup>
+        </Marker>
+      </MapContainer>
     </div>
   );
 };
