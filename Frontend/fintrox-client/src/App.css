@@ -1,1 +1,12 @@
 @import "tailwindcss";
+
+.leaflet-container {
+  z-index: 0 !important;
+  height: 100%;
+  width: 100%;
+}
+
+.custom-marker-icon {
+  background: transparent !important;
+  border: none !important;
+}

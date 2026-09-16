@@ -10,8 +10,7 @@ const RouteMap: React.FC<RouteMapProps> = ({ route }) => {
 
   useEffect(() => {
     if (route && mapRef.current) {
-      // Map initialization would go here
-      // Using Leaflet or Google Maps
+      
       console.log('Map would render for route:', route.name);
     }
   }, [route]);
