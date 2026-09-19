@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import loanApi, { Loan, CustomerLoanSummary, CreateLoanRequest } from '../../api/loanApi';
-import customerApi, { Customer } from '../../api/customerApi';
-import LoanFilters from '../../components/loans/LoanFilters';
-import LoanList from '../../components/loans/LoanList';
-import LoanModal from '../../components/loans/LoanModal';
-import LoanStatusDialog from '../../components/loans/LoanStatusDialog';
-import LoanCloseDialog from '../../components/loans/LoanCloseDialog';
-import LoanDrawer from '../../components/loans/LoanDrawer';
+import customerApi, { type Customer } from '../api/customerApi';
+import loanApi, { type Loan,type CreateLoanRequest } from '../api/loanApi';
+import LoanCloseDialog from '../components/loans/LoanCloseDialog';
+import LoanDrawer from '../components/loans/LoanDrawer';
+import LoanFilters from '../components/loans/LoanFilters';
+import LoanList from '../components/loans/LoanList';
+import LoanModal from '../components/loans/LoanModal';
+import LoanStatusDialog from '../components/loans/LoanStatusDialog';
+
 
 type LoanStatsType = {
   total: number;
