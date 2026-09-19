@@ -37,7 +37,6 @@ public class LoanResponse {
     private LocalDate endDate;
     private String status;
 
-    // ✅ Use the separate DTO
     private List<InstallmentScheduleDto> installmentSchedule;
 
     private LocalDateTime createdAt;
