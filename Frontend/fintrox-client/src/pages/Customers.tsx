@@ -90,7 +90,7 @@ const Customers: React.FC = () => {
   const fetchEmployees = async () => {
     try {
       const response = await employeeApi.getAll();
-      setEmployees(response.data || []);
+      setEmployees(response.data.data || []);
     } catch (error) {
       console.error("Error fetching employees:", error);
     }
