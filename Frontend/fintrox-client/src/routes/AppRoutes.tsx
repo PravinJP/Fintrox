@@ -15,6 +15,7 @@ import RoutesPage from '../pages/Routes';
 import Customers from '../pages/Customers';
 import Loans from '../pages/Loans';
 import Collections from '../pages/Collections';
+import Reports from '../pages/Reports';
 
 const AppRoutes: React.FC = () => {
   const { isAuthenticated, loading } = useSelector((state: RootState) => state.auth);
@@ -46,6 +47,8 @@ const AppRoutes: React.FC = () => {
           <Route path="/customers" element={<Customers />} />
           <Route path="/loans" element={<Loans />} />
           <Route path="/collections" element={<Collections />} />
+          <Route path="/reports" element={<Reports />} />
+
         </Route>
       </Route>
       
