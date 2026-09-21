@@ -1,5 +1,5 @@
 import React from 'react';
-import type { OverdueLoanReport } from '../../api/reportApi';
+import type { OverdueLoanReport } from '../../api/reportsApi';
 
 interface OverdueReportViewProps {
   data: OverdueLoanReport | null;

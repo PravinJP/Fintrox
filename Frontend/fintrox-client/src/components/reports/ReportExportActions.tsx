@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import reportApi from '../../api/reportApi';
+import reportApi from '../../api/reportsApi';
 
 interface ReportExportActionsProps {
   reportType: string;

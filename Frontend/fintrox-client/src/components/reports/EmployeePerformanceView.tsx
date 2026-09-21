@@ -1,5 +1,5 @@
 import React from 'react';
-import type { EmployeePerformanceReport } from '../../api/reportApi';
+import type { EmployeePerformanceReport } from '../../api/reportsApi';
 
 interface EmployeePerformanceViewProps {
   data: EmployeePerformanceReport | null;

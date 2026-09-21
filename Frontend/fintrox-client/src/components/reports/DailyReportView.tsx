@@ -1,5 +1,5 @@
 import React from 'react';
-import type { DailyCollectionReport } from '../../api/reportApi';
+import type { DailyCollectionReport } from '../../api/reportsApi';
 
 interface DailyReportViewProps {
   data: DailyCollectionReport | null;
