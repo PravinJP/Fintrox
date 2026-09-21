@@ -12,7 +12,7 @@ const Sidebar: React.FC = () => {
     { path: '/loans', label: 'Loans', icon: 'account_balance_wallet' },
     { path: '/collections', label: 'Collections', icon: 'payments' },
     { path: '/reports', label: 'Reports', icon: 'analytics' },
-    { path: '/settings', label: 'Settings', icon: 'settings' },
+    
   ];
 
   return (
