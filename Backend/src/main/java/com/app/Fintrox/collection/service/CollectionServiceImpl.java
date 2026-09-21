@@ -137,13 +137,15 @@ public class CollectionServiceImpl implements CollectionService {
         log.info("Collection recorded: {} for loan: {} by employee: {}",
                 savedCollection.getCollectionNumber(), loan.getLoanNumber(), employeeId);
 
-        Employee employee = employeeRepository.findById(employeeId).orElse(null);
+        Employee employee = null;
+        if (employeeId != null) {
+            employee = employeeRepository.findById(employeeId).orElse(null);
+        }
 
         CollectionResponse response = collectionMapper.toResponseWithDetails(savedCollection, loan, customer, employee);
         response.setOutstandingBalanceAfter(loan.getOutstandingBalance());
         return response;
     }
-
     @Override
     public CollectionResponse getCollectionById(Long id) {
         Collection collection = collectionRepository.findById(id)
