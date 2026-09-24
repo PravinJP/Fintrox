@@ -4,7 +4,6 @@ export interface DashboardData {
   todayCollection?: number;
   todayCollectionCount?: number;
   weeklyCollection?: number;
-  monthlyCollection?: number;
   totalOutstanding?: number;
   activeLoansCount?: number;
   totalEmployees?: number;
