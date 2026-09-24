@@ -39,7 +39,7 @@ const Dashboard: React.FC = () => {
 
       console.log('📥 Raw response:', response.data);
 
-      const dashboardData = response.data?.data || response.data;
+      const dashboardData = (response.data as any)?.data ?? response.data;
       console.log('📊 Dashboard data:', dashboardData);
 
       setData(dashboardData);
