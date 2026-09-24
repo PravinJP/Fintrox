@@ -1,36 +1,44 @@
-import api from './axiosConfig';
-
 export interface DashboardData {
-  todayCollection: number;
-  totalCustomers: number;
-  activeLoans: number;
-  totalEmployees: number;
-  weeklyTrend: { date: string; amount: number }[];
-  topPerformers: { name: string; amount: number; percentage: number }[];
-  recentCollections: {
-    id: number;
-    customerName: string;
-    initials: string;
-    amount: number;
-    route: string;
-    time: string;
-  }[];
-  alerts: {
-    id: number;
-    type: 'overdue' | 'route' | 'approval';
-    title: string;
-    description: string;
-  }[];
+  todayCollection?: number;
+  todayCollectionCount?: number;
+  weeklyCollection?: number;
+  monthlyCollection?: number;
+  totalOutstanding?: number;
+  activeLoansCount?: number;
+  totalEmployees?: number;
+  totalCustomers?: number;
+  overdueLoansCount?: number;
+  overdueAmount?: number;
+  overdueLoans?: any[];
+  topPerformers?: any[];
+  recentActivities?: any[];
+  weeklyTrend?: any[];
+
   totalLoanAmountGiven?: number;
   totalAmountReceived?: number;
   outstandingBalance?: number;
+  activeLoans?: number;
+
   targetAchievementPercentage?: number;
   visitedCustomers?: number;
   pendingCustomers?: number;
+  monthlyTarget?: number;
+  monthlyCollection?: number;
+  todayVisits?: number;
+
+  recentCollections?: any[];
+  alerts?: any[];
+}
+
+export interface ApiResponse<T> {
+  success: boolean;
+  message: string;
+  data: T;
+  timestamp: string;
 }
 
 export const dashboardApi = {
-  getOwnerDashboard: () => api.get<DashboardData>('/dashboard/owner'),
-  getEmployeeDashboard: () => api.get<DashboardData>('/dashboard/employee'),
-  getLenderDashboard: () => api.get<DashboardData>('/dashboard/lender'),
+  getOwnerDashboard: () => api.get<ApiResponse<DashboardData>>('/dashboard/owner'),
+  getEmployeeDashboard: () => api.get<ApiResponse<DashboardData>>('/dashboard/employee'),
+  getLenderDashboard: () => api.get<ApiResponse<DashboardData>>('/dashboard/lender'),
 };
