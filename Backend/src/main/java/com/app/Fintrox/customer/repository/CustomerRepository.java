@@ -16,26 +16,25 @@ import java.util.Optional;
 @Repository
 public interface CustomerRepository extends JpaRepository<Customer, Long> {
 
-    // ===== Basic Find Methods =====
+
     Optional<Customer> findById(Long id);
     Optional<Customer> findByPhone(String phone);
     Optional<Customer> findByEmail(String email);
     List<Customer> findByFullNameContainingIgnoreCase(String fullName);
 
-    // ===== Organization-based Queries =====
+
     List<Customer> findByOrganizationId(Long organizationId);
     List<Customer> findByOrganizationIdAndIsActiveTrue(Long organizationId);
     List<Customer> findByOrganizationIdOrderByFullNameAsc(Long organizationId);
 
-    // ===== Route-based Queries =====
+
     List<Customer> findByRouteId(Long routeId);
     List<Customer> findByRouteIdAndIsActiveTrue(Long routeId);
 
-    // ===== Employee-based Queries =====
+
     List<Customer> findByAssignedEmployeeId(Long employeeId);
     List<Customer> findByAssignedEmployeeIdAndIsActiveTrue(Long employeeId);
 
-    // ===== Status Queries =====
     List<Customer> findByIsActiveTrue();
     List<Customer> findByIsBlockedTrue();
 
@@ -103,4 +102,6 @@ public interface CustomerRepository extends JpaRepository<Customer, Long> {
     @Query("UPDATE Customer c SET c.activeLoansCount = c.activeLoansCount - 1 " +
             "WHERE c.id = :customerId AND c.activeLoansCount > 0")
     void removeActiveLoan(@Param("customerId") Long customerId);
+
+
 }

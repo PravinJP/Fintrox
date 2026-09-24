@@ -55,4 +55,15 @@ public interface LoanRepository extends JpaRepository<Loan, Long> {
     @Transactional
     @Query("UPDATE Loan l SET l.isActive = :active WHERE l.id = :loanId")
     void updateActiveStatus(@Param("loanId") Long loanId, @Param("active") boolean active);
+
+    @Query("SELECT COALESCE(SUM(l.outstandingBalance), 0.0) FROM Loan l WHERE l.organizationId = :orgId AND l.status = 'OVERDUE'")
+    Double getTotalOverdueAmount(@Param("orgId") Long orgId);
+
+    @Query("SELECT l FROM Loan l WHERE l.organizationId = :orgId AND l.status = 'OVERDUE' ORDER BY l.nextDueDate ASC")
+    List<Loan> findOverdueLoans(@Param("orgId") Long orgId);
+
+    @Query("SELECT l FROM Loan l WHERE l.organizationId = :orgId ORDER BY l.createdAt DESC")
+    List<Loan> findRecentLoans(@Param("orgId") Long orgId, org.springframework.data.domain.Pageable pageable);
+
+
 }
