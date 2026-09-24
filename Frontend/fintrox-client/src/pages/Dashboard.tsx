@@ -25,7 +25,7 @@ const Dashboard: React.FC = () => {
   const fetchDashboardData = async () => {
     try {
       setLoading(true);
-      
+
       let response;
       if (user?.userType === 'OWNER') {
         response = await dashboardApi.getOwnerDashboard();
@@ -36,13 +36,18 @@ const Dashboard: React.FC = () => {
       } else {
         response = await dashboardApi.getOwnerDashboard();
       }
-      
-      setData(response.data);
+
+      console.log('📥 Raw response:', response.data);
+
+      const dashboardData = response.data?.data || response.data;
+      console.log('📊 Dashboard data:', dashboardData);
+
+      setData(dashboardData);
       setError('');
       setNeedsOrganization(false);
     } catch (err: any) {
       console.error('Dashboard error:', err);
-      
+
       if (err.response?.data?.message?.includes('does not belong to any organization')) {
         setNeedsOrganization(true);
         setError('Please create your organization first.');
@@ -135,7 +140,7 @@ const Dashboard: React.FC = () => {
             />
             <KPICard
               label="Active Loans"
-              value={data?.activeLoans || 0}
+              value={data?.activeLoansCount || 0}
               icon="account_balance_wallet"
             />
             <KPICard
@@ -205,8 +210,8 @@ const Dashboard: React.FC = () => {
       )}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <RecentCollections collections={data?.recentCollections || []} />
-        {isOwner && <OverdueAlerts alerts={data?.alerts || []} />}
+        <RecentCollections collections={data?.recentActivities || []} />
+        {isOwner && <OverdueAlerts alerts={data?.overdueLoans || []} />}
       </div>
     </div>
   );

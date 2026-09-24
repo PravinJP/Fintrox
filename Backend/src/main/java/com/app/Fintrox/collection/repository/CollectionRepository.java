@@ -75,11 +75,11 @@ public interface CollectionRepository extends JpaRepository<Collection, Long> {
     @Query(value = "SELECT EXTRACT(WEEK FROM c.created_at), COALESCE(SUM(c.amount), 0), COUNT(c) FROM collections c WHERE c.organization_id = :orgId AND c.created_at BETWEEN :start AND :end GROUP BY EXTRACT(WEEK FROM c.created_at) ORDER BY EXTRACT(WEEK FROM c.created_at)", nativeQuery = true)
     List<Object[]> getWeeklyBreakdown(@Param("orgId") Long orgId, @Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
 
-
     @Query("SELECT c FROM Collection c WHERE c.organizationId = :orgId ORDER BY c.createdAt DESC")
     List<Collection> findRecentCollections(@Param("orgId") Long orgId, org.springframework.data.domain.Pageable pageable);
 
-
+    @Query("SELECT c FROM Collection c WHERE c.organizationId = :orgId ORDER BY c.createdAt DESC")
+    List<Collection> findRecentCollectionsByOrg(@Param("orgId") Long orgId);
 
     @Query("SELECT c.employeeId, COALESCE(SUM(c.amount), 0.0) FROM Collection c WHERE c.organizationId = :orgId AND c.employeeId IS NOT NULL AND c.createdAt BETWEEN :start AND :end GROUP BY c.employeeId ORDER BY SUM(c.amount) DESC")
     List<Object[]> findTopPerformers(@Param("orgId") Long orgId, @Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
