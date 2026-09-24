@@ -1,3 +1,5 @@
+import api from "./axiosConfig";
+
 export interface DashboardData {
   todayCollection?: number;
   todayCollectionCount?: number;
