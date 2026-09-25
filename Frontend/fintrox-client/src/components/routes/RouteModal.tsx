@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import type { Route, CreateRouteRequest } from '../../api/routeApi';
+import type {
+  Route,
+  CreateRouteRequest,
+} from '../../api/routeApi';
 import type { Employee } from '../../api/employeeApi';
-
 
 interface RouteModalProps {
   isOpen: boolean;
@@ -20,15 +22,16 @@ const RouteModal: React.FC<RouteModalProps> = ({
   employees,
   loading,
 }) => {
-  const [formData, setFormData] = useState<CreateRouteRequest>({
-    name: '',
-    description: '',
-    area: '',
-    city: '',
-    state: '',
-    pincode: '',
-    assignedEmployeeId: undefined,
-  });
+  const [formData, setFormData] =
+    useState<CreateRouteRequest>({
+      name: '',
+      description: '',
+      area: '',
+      city: '',
+      state: '',
+      pincode: '',
+      assignedEmployeeId: undefined,
+    });
 
   useEffect(() => {
     if (route) {
@@ -39,7 +42,8 @@ const RouteModal: React.FC<RouteModalProps> = ({
         city: route.city || '',
         state: route.state || '',
         pincode: route.pincode || '',
-        assignedEmployeeId: route.assignedEmployeeId || undefined,
+        assignedEmployeeId:
+          route.assignedEmployeeId || undefined,
       });
     } else {
       setFormData({
@@ -59,117 +63,475 @@ const RouteModal: React.FC<RouteModalProps> = ({
     onSave(formData);
   };
 
-  if (!isOpen) return null;
+  if (!isOpen) {
+    return null;
+  }
 
   return (
-    <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-[12px] shadow-xl border border-slate-200 w-full max-w-lg overflow-hidden">
-        <div className="p-6 border-b border-slate-100 flex items-center justify-between">
-          <h3 className="font-bold text-slate-900 text-lg">
+    <div
+      className="
+        fixed
+        inset-0
+        z-[9999]
+        isolate
+        flex
+        items-center
+        justify-center
+        bg-slate-900/50
+        backdrop-blur-sm
+        p-4
+      "
+    >
+      <div
+        className="
+          relative
+          z-[10000]
+          w-full
+          max-w-lg
+          max-h-[90vh]
+          overflow-hidden
+          rounded-[12px]
+          border
+          border-slate-200
+          bg-white
+          shadow-xl
+        "
+      >
+        {/* Header */}
+        <div
+          className="
+            flex
+            items-center
+            justify-between
+            border-b
+            border-slate-100
+            p-6
+          "
+        >
+          <h3 className="text-lg font-bold text-slate-900">
             {route ? 'Edit Route' : 'Create New Route'}
           </h3>
-          <button className="text-slate-400 hover:text-slate-600" onClick={onClose}>
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path d="M6 18L18 6M6 6l12 12" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
+
+          <button
+            type="button"
+            className="text-slate-400 transition-colors hover:text-slate-600"
+            onClick={onClose}
+            aria-label="Close modal"
+          >
+            <svg
+              className="h-5 w-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                d="M6 18L18 6M6 6l12 12"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+              />
             </svg>
           </button>
         </div>
+
+        {/* Form */}
         <form onSubmit={handleSubmit}>
-          <div className="p-6 space-y-4">
+          <div className="max-h-[calc(90vh-145px)] overflow-y-auto p-6 space-y-4">
+
+            {/* Route Name */}
             <div>
-              <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Route Name *</label>
+              <label
+                htmlFor="route-name"
+                className="
+                  mb-1
+                  block
+                  text-xs
+                  font-semibold
+                  uppercase
+                  tracking-wider
+                  text-slate-700
+                "
+              >
+                Route Name *
+              </label>
+
               <input
-                className="w-full text-sm bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                id="route-name"
+                className="
+                  w-full
+                  rounded-xl
+                  border
+                  border-slate-200
+                  bg-slate-50
+                  px-4
+                  py-2.5
+                  text-sm
+                  focus:border-primary
+                  focus:outline-none
+                  focus:ring-2
+                  focus:ring-primary/20
+                "
                 placeholder="e.g. Downtown Express"
                 type="text"
                 required
                 value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    name: e.target.value,
+                  })
+                }
               />
             </div>
+
+            {/* Description */}
             <div>
-              <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Description *</label>
+              <label
+                htmlFor="route-description"
+                className="
+                  mb-1
+                  block
+                  text-xs
+                  font-semibold
+                  uppercase
+                  tracking-wider
+                  text-slate-700
+                "
+              >
+                Description *
+              </label>
+
               <textarea
-                className="w-full text-sm bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                id="route-description"
+                className="
+                  w-full
+                  rounded-xl
+                  border
+                  border-slate-200
+                  bg-slate-50
+                  px-4
+                  py-2.5
+                  text-sm
+                  focus:border-primary
+                  focus:outline-none
+                  focus:ring-2
+                  focus:ring-primary/20
+                "
                 placeholder="Route description"
                 rows={3}
                 required
                 value={formData.description}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    description: e.target.value,
+                  })
+                }
               />
             </div>
-            <div className="grid grid-cols-2 gap-4">
+
+            {/* Area + City */}
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+
               <div>
-                <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Area</label>
+                <label
+                  htmlFor="route-area"
+                  className="
+                    mb-1
+                    block
+                    text-xs
+                    font-semibold
+                    uppercase
+                    tracking-wider
+                    text-slate-700
+                  "
+                >
+                  Area
+                </label>
+
                 <input
-                  className="w-full text-sm bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                  id="route-area"
+                  className="
+                    w-full
+                    rounded-xl
+                    border
+                    border-slate-200
+                    bg-slate-50
+                    px-4
+                    py-2.5
+                    text-sm
+                    focus:border-primary
+                    focus:outline-none
+                    focus:ring-2
+                    focus:ring-primary/20
+                  "
                   placeholder="e.g. North District"
                   type="text"
                   value={formData.area}
-                  onChange={(e) => setFormData({ ...formData, area: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      area: e.target.value,
+                    })
+                  }
                 />
               </div>
+
               <div>
-                <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">City</label>
+                <label
+                  htmlFor="route-city"
+                  className="
+                    mb-1
+                    block
+                    text-xs
+                    font-semibold
+                    uppercase
+                    tracking-wider
+                    text-slate-700
+                  "
+                >
+                  City
+                </label>
+
                 <input
-                  className="w-full text-sm bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                  id="route-city"
+                  className="
+                    w-full
+                    rounded-xl
+                    border
+                    border-slate-200
+                    bg-slate-50
+                    px-4
+                    py-2.5
+                    text-sm
+                    focus:border-primary
+                    focus:outline-none
+                    focus:ring-2
+                    focus:ring-primary/20
+                  "
                   placeholder="e.g. Mumbai"
                   type="text"
                   value={formData.city}
-                  onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      city: e.target.value,
+                    })
+                  }
                 />
               </div>
+
             </div>
-            <div className="grid grid-cols-2 gap-4">
+
+            {/* State + Pincode */}
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+
               <div>
-                <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">State</label>
+                <label
+                  htmlFor="route-state"
+                  className="
+                    mb-1
+                    block
+                    text-xs
+                    font-semibold
+                    uppercase
+                    tracking-wider
+                    text-slate-700
+                  "
+                >
+                  State
+                </label>
+
                 <input
-                  className="w-full text-sm bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                  id="route-state"
+                  className="
+                    w-full
+                    rounded-xl
+                    border
+                    border-slate-200
+                    bg-slate-50
+                    px-4
+                    py-2.5
+                    text-sm
+                    focus:border-primary
+                    focus:outline-none
+                    focus:ring-2
+                    focus:ring-primary/20
+                  "
                   placeholder="e.g. Maharashtra"
                   type="text"
                   value={formData.state}
-                  onChange={(e) => setFormData({ ...formData, state: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      state: e.target.value,
+                    })
+                  }
                 />
               </div>
+
               <div>
-                <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Pincode</label>
+                <label
+                  htmlFor="route-pincode"
+                  className="
+                    mb-1
+                    block
+                    text-xs
+                    font-semibold
+                    uppercase
+                    tracking-wider
+                    text-slate-700
+                  "
+                >
+                  Pincode
+                </label>
+
                 <input
-                  className="w-full text-sm bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                  id="route-pincode"
+                  className="
+                    w-full
+                    rounded-xl
+                    border
+                    border-slate-200
+                    bg-slate-50
+                    px-4
+                    py-2.5
+                    text-sm
+                    focus:border-primary
+                    focus:outline-none
+                    focus:ring-2
+                    focus:ring-primary/20
+                  "
                   placeholder="e.g. 400001"
                   type="text"
                   value={formData.pincode}
-                  onChange={(e) => setFormData({ ...formData, pincode: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      pincode: e.target.value,
+                    })
+                  }
                 />
               </div>
+
             </div>
+
+            {/* Employee */}
             <div>
-              <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Assign Employee (Optional)</label>
-              <select
-                className="w-full text-sm bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
-                value={formData.assignedEmployeeId || ''}
-                onChange={(e) => setFormData({ ...formData, assignedEmployeeId: e.target.value ? Number(e.target.value) : undefined })}
+              <label
+                htmlFor="route-employee"
+                className="
+                  mb-1
+                  block
+                  text-xs
+                  font-semibold
+                  uppercase
+                  tracking-wider
+                  text-slate-700
+                "
               >
-                <option value="">Select employee</option>
+                Assign Employee (Optional)
+              </label>
+
+              <select
+                id="route-employee"
+                className="
+                  w-full
+                  rounded-xl
+                  border
+                  border-slate-200
+                  bg-slate-50
+                  px-4
+                  py-2.5
+                  text-sm
+                  focus:border-primary
+                  focus:outline-none
+                  focus:ring-2
+                  focus:ring-primary/20
+                "
+                value={formData.assignedEmployeeId || ''}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    assignedEmployeeId: e.target.value
+                      ? Number(e.target.value)
+                      : undefined,
+                  })
+                }
+              >
+                <option value="">
+                  Select employee
+                </option>
+
                 {employees.map((emp) => (
-                  <option key={emp.id} value={emp.id}>{emp.fullName}</option>
+                  <option
+                    key={emp.id}
+                    value={emp.id}
+                  >
+                    {emp.fullName}
+                  </option>
                 ))}
               </select>
             </div>
+
           </div>
-          <div className="p-4 border-t border-slate-100 bg-slate-50 flex justify-end space-x-3">
+
+          {/* Footer */}
+          <div
+            className="
+              flex
+              justify-end
+              space-x-3
+              border-t
+              border-slate-100
+              bg-slate-50
+              p-4
+            "
+          >
             <button
               type="button"
-              className="px-4 py-2 bg-white border border-slate-200 hover:bg-slate-100 text-slate-700 text-sm font-semibold rounded-xl transition-colors"
+              className="
+                rounded-xl
+                border
+                border-slate-200
+                bg-white
+                px-4
+                py-2
+                text-sm
+                font-semibold
+                text-slate-700
+                transition-colors
+                hover:bg-slate-100
+              "
               onClick={onClose}
             >
               Cancel
             </button>
+
             <button
               type="submit"
               disabled={loading}
-              className="px-4 py-2 bg-primary hover:bg-primary-dark text-white text-sm font-semibold rounded-xl shadow-sm shadow-primary/30 transition-colors disabled:opacity-50"
+              className="
+                rounded-xl
+                bg-primary
+                px-4
+                py-2
+                text-sm
+                font-semibold
+                text-white
+                shadow-sm
+                shadow-primary/30
+                transition-colors
+                hover:bg-primary-dark
+                disabled:cursor-not-allowed
+                disabled:opacity-50
+              "
             >
-              {loading ? 'Saving...' : route ? 'Update Route' : 'Save Route'}
+              {loading
+                ? 'Saving...'
+                : route
+                  ? 'Update Route'
+                  : 'Save Route'}
             </button>
           </div>
         </form>
