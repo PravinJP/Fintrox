@@ -16,17 +16,15 @@ const LandingPage: React.FC = () => {
     <div className="w-full min-h-screen bg-white">
       <LandingNav />
       <main className="w-full pt-16">
-        <div className="w-full mx-auto px-6 md:px-10 lg:px-16" style={{ maxWidth: 'clamp(1280px, 90vw, 1800px)' }}>
-          <HeroSection />
-          <SolvesSection />
-          <FeaturesSection />
-          <CollectionsShowcase />
-          <ReportsShowcase />
-          <HowItWorksSection />
-          <RoleDashboardsSection />
-          <DetailsSection />
-          <FinalCTASection />
-        </div>
+        <HeroSection />
+        <SolvesSection />
+        <FeaturesSection />
+        <CollectionsShowcase />
+        <ReportsShowcase />
+        <HowItWorksSection />
+        <RoleDashboardsSection />
+        <DetailsSection />
+        <FinalCTASection />
       </main>
       <LandingFooter />
     </div>
