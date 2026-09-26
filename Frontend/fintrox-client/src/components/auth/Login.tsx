@@ -18,15 +18,14 @@ const Login: React.FC = () => {
 
     try {
       const result = await dispatch(login({ email, password })).unwrap();
-      console.log('✅ Login successful:', result);
 
       if (result.organizationId) {
         navigate('/dashboard');
       } else {
         navigate('/settings/organization');
       }
-    } catch (err: any) {
-      console.error('❌ Login error:', err);
+    } catch (err) {
+      // Silent in production — error shown via Redux state
     }
   };
 
