@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import type { RootState } from '../../store/store';
 
 const Sidebar: React.FC = () => {
   const location = useLocation();
+  const user = useSelector((state: RootState) => state.auth.user);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const menuItems = [
@@ -34,36 +37,41 @@ const Sidebar: React.FC = () => {
     setIsMobileMenuOpen(false);
   };
 
+  const getInitials = (name?: string) => {
+    if (!name) return 'U';
+    return name
+      .split(' ')
+      .map((n) => n[0])
+      .join('')
+      .slice(0, 2)
+      .toUpperCase();
+  };
+
+  const getRoleLabel = (userType?: string) => {
+    if (userType === 'OWNER') return 'Business Owner';
+    if (userType === 'EMPLOYEE') return 'Field Agent';
+    if (userType === 'INDIVIDUAL_LENDER') return 'Individual Lender';
+    return 'Professional Plan';
+  };
+
   return (
     <>
-      
       <nav
         className="
-          hidden
-          md:flex
-          fixed
-          left-0
-          top-0
-          z-20
-          h-screen
-          w-64
-          flex-col
-          border-r
-          border-[#dde4e6]
-          bg-[#f4fafd]
-          p-4
+          hidden md:flex fixed left-0 top-0 z-20 h-screen w-64 flex-col
+          border-r border-[#dde4e6] bg-[#f4fafd] p-4
         "
       >
         <div className="mb-8 mt-4 flex items-center gap-3 px-4">
-          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#2d6a4f] text-white">
-            <span className="material-symbols-outlined text-xl">domain</span>
+          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#2d6a4f] text-white text-sm font-semibold">
+            {getInitials(user?.fullName)}
           </div>
-          <div>
-            <h1 className="text-[20px] font-semibold leading-[28px] text-[#0f5238]">
-              Fintrox Admin
+          <div className="min-w-0">
+            <h1 className="text-[16px] font-semibold leading-[22px] text-[#0f5238] truncate">
+              {user?.fullName || 'User'}
             </h1>
-            <p className="text-[12px] font-medium leading-[16px] tracking-[0.02em] text-[#404943]">
-              Professional Plan
+            <p className="text-[12px] font-medium leading-[16px] tracking-[0.02em] text-[#404943] truncate">
+              {getRoleLabel(user?.userType)}
             </p>
           </div>
         </div>
@@ -90,43 +98,20 @@ const Sidebar: React.FC = () => {
             );
           })}
         </ul>
-
-        
       </nav>
 
-      
       <header
         className="
-          fixed
-          left-0
-          right-0
-          top-0
-          z-40
-          flex
-          h-16
-          items-center
-          justify-between
-          border-b
-          border-[#dde4e6]
-          bg-[#f4fafd]
-          px-4
-          md:hidden
+          fixed left-0 right-0 top-0 z-40 flex h-16 items-center justify-between
+          border-b border-[#dde4e6] bg-[#f4fafd] px-4 md:hidden
         "
       >
         <button
           type="button"
           onClick={() => setIsMobileMenuOpen(true)}
           className="
-            flex
-            h-10
-            w-10
-            items-center
-            justify-center
-            rounded-lg
-            text-[#404943]
-            transition-colors
-            hover:bg-[#e8eff1]
-            active:bg-[#dde4e6]
+            flex h-10 w-10 items-center justify-center rounded-lg
+            text-[#404943] transition-colors hover:bg-[#e8eff1] active:bg-[#dde4e6]
           "
           aria-label="Open navigation"
         >
@@ -134,14 +119,16 @@ const Sidebar: React.FC = () => {
         </button>
 
         <div className="flex items-center gap-2">
-          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#2d6a4f] text-white">
-            <span className="material-symbols-outlined text-lg">domain</span>
+          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#2d6a4f] text-white text-xs font-semibold">
+            {getInitials(user?.fullName)}
           </div>
-          <div>
-            <h1 className="text-[17px] font-semibold leading-[22px] text-[#0f5238]">
-              Fintrox
+          <div className="min-w-0">
+            <h1 className="text-[15px] font-semibold leading-[20px] text-[#0f5238] truncate">
+              {user?.fullName || 'User'}
             </h1>
-            <p className="text-[10px] font-medium text-[#404943]">Admin</p>
+            <p className="text-[10px] font-medium text-[#404943] truncate">
+              {getRoleLabel(user?.userType)}
+            </p>
           </div>
         </div>
 
@@ -151,36 +138,25 @@ const Sidebar: React.FC = () => {
       {isMobileMenuOpen && (
         <div
           className="
-            fixed
-            inset-0
-            z-[100]
-            bg-slate-900/40
-            backdrop-blur-[2px]
-            md:hidden
+            fixed inset-0 z-[100] bg-slate-900/40 backdrop-blur-[2px] md:hidden
           "
           onClick={() => setIsMobileMenuOpen(false)}
         >
           <aside
-            className="
-              h-full
-              w-[280px]
-              max-w-[85vw]
-              bg-[#f4fafd]
-              shadow-2xl
-            "
+            className="h-full w-[280px] max-w-[85vw] bg-[#f4fafd] shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between border-b border-[#dde4e6] p-5">
-              <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#2d6a4f] text-white">
-                  <span className="material-symbols-outlined text-xl">domain</span>
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#2d6a4f] text-white text-sm font-semibold shrink-0">
+                  {getInitials(user?.fullName)}
                 </div>
-                <div>
-                  <h1 className="text-[18px] font-semibold leading-[24px] text-[#0f5238]">
-                    Fintrox Admin
+                <div className="min-w-0">
+                  <h1 className="text-[16px] font-semibold leading-[22px] text-[#0f5238] truncate">
+                    {user?.fullName || 'User'}
                   </h1>
-                  <p className="text-[11px] font-medium text-[#404943]">
-                    Professional Plan
+                  <p className="text-[11px] font-medium text-[#404943] truncate">
+                    {getRoleLabel(user?.userType)}
                   </p>
                 </div>
               </div>
@@ -189,15 +165,8 @@ const Sidebar: React.FC = () => {
                 type="button"
                 onClick={() => setIsMobileMenuOpen(false)}
                 className="
-                  flex
-                  h-9
-                  w-9
-                  items-center
-                  justify-center
-                  rounded-lg
-                  text-[#404943]
-                  transition-colors
-                  hover:bg-[#e8eff1]
+                  flex h-9 w-9 items-center justify-center rounded-lg
+                  text-[#404943] transition-colors hover:bg-[#e8eff1] shrink-0
                 "
                 aria-label="Close navigation"
               >
@@ -231,12 +200,6 @@ const Sidebar: React.FC = () => {
                   );
                 })}
               </ul>
-
-              <div className="border-t border-[#dde4e6] pt-4">
-                <button className="w-full rounded-xl bg-[#2d6a4f] py-3 text-[14px] font-medium leading-[20px] text-white shadow-sm transition-colors hover:bg-[#3f6653]">
-                  Upgrade Now
-                </button>
-              </div>
             </div>
           </aside>
         </div>
