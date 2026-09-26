@@ -5,7 +5,7 @@ import Sidebar from '../common/Sidebar';
 
 const DashboardLayout: React.FC = () => {
   return (
-    <div className="flex h-screen overflow-hidden bg-[#f4fafd]">
+    <div className="flex h-screen ">
       <Sidebar />
       <div className="flex-1 flex flex-col md:ml-64 h-full overflow-hidden">
         <DashboardHeader />
