@@ -1,9 +1,10 @@
 import React from 'react';
+import LandingContainer from './LandingContainer';
 
 const CollectionsShowcase: React.FC = () => {
   return (
-    <section className="bg-[#F8FAFB] py-16 md:py-24 px-4 md:px-8 border-y border-[#E5E9EB] w-full">
-      <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-16 items-center">
+    <section className="bg-[#F8FAFB] py-16 md:py-24 border-y border-[#E5E9EB] w-full">
+      <LandingContainer className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-16 items-center">
         <div className="border border-[#E5E9EB] rounded-[8px] bg-white overflow-hidden shadow-sm">
           <div className="p-4 border-b border-[#E5E9EB] flex items-center justify-between bg-[#F8FAFB]">
             <span className="text-[12px] font-semibold text-[#0F1419] uppercase tracking-wide">
@@ -55,7 +56,7 @@ const CollectionsShowcase: React.FC = () => {
             ))}
           </div>
         </div>
-      </div>
+      </LandingContainer>
     </section>
   );
 };

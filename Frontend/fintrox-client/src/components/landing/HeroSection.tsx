@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import LandingContainer from './LandingContainer';
 
 const HeroSection: React.FC = () => {
   const scrollToFeatures = () => {
@@ -12,19 +13,18 @@ const HeroSection: React.FC = () => {
   };
 
   return (
-    <section className="relative w-full bg-gradient-to-b from-[#F8FAFB] via-[#F4F8F5] to-[#F8FAFB] overflow-hidden">
+    <section className="relative w-full bg-[#F8FAFB] overflow-hidden">
       {/* Subtle green glow */}
       <div
-        className="absolute top-0 right-0 w-[500px] h-[500px] pointer-events-none opacity-50"
+        className="absolute top-0 right-0 w-[500px] h-[500px] pointer-events-none opacity-40"
         style={{
           background: 'radial-gradient(circle at top right, #D8F3DC 0%, transparent 65%)',
         }}
       ></div>
 
-      {/* Original width: max-w-7xl (1280px) */}
-      <div className="relative max-w-7xl mx-auto px-4 md:px-8 py-14 md:py-20">
+      <LandingContainer className="relative py-16 md:py-24">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center">
-          {/* LEFT: Text */}
+          {/* LEFT */}
           <div className="lg:col-span-6">
             <span className="text-[13px] uppercase tracking-wider font-semibold text-[#2D6A4F] mb-3 inline-flex items-center gap-2">
               <span className="w-1.5 h-1.5 rounded-full bg-[#2D6A4F]"></span>
@@ -63,10 +63,9 @@ const HeroSection: React.FC = () => {
             </p>
           </div>
 
-          {/* RIGHT: Dashboard image */}
+          {/* RIGHT */}
           <div className="lg:col-span-6">
             <div className="relative">
-              {/* Decorative dotted pattern */}
               <div
                 className="absolute -top-4 -right-4 w-24 h-24 pointer-events-none opacity-40 hidden md:block"
                 style={{
@@ -75,7 +74,6 @@ const HeroSection: React.FC = () => {
                 }}
               ></div>
 
-              {/* Image frame */}
               <div className="relative rounded-[12px] overflow-hidden border border-[#E5E9EB] shadow-[0_12px_32px_rgba(45,106,79,0.10)] bg-white">
                 <img
                   src="/hero-dashboard.png"
@@ -86,7 +84,7 @@ const HeroSection: React.FC = () => {
             </div>
           </div>
         </div>
-      </div>
+      </LandingContainer>
     </section>
   );
 };

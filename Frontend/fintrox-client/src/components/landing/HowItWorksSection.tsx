@@ -1,4 +1,5 @@
 import React from 'react';
+import LandingContainer from './LandingContainer';
 
 const HowItWorksSection: React.FC = () => {
   const steps = [
@@ -21,10 +22,10 @@ const HowItWorksSection: React.FC = () => {
 
   return (
     <section
-      className="bg-[#F8FAFB] py-16 md:py-24 px-4 md:px-8 border-y border-[#E5E9EB] w-full"
+      className="bg-[#F8FAFB] py-16 md:py-24 border-y border-[#E5E9EB] w-full"
       id="how-it-works"
     >
-      <div className="max-w-5xl mx-auto">
+      <LandingContainer>
         <h2 className="text-[28px] md:text-[40px] font-bold text-[#0F1419] mb-12 md:mb-16 tracking-tight text-center">
           Three steps to get started.
         </h2>
@@ -43,7 +44,7 @@ const HowItWorksSection: React.FC = () => {
             </div>
           ))}
         </div>
-      </div>
+      </LandingContainer>
     </section>
   );
 };

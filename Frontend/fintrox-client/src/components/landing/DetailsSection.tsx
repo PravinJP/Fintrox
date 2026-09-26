@@ -1,4 +1,5 @@
 import React from 'react';
+import LandingContainer from './LandingContainer';
 
 const DetailsSection: React.FC = () => {
   const details = [
@@ -9,8 +10,8 @@ const DetailsSection: React.FC = () => {
   ];
 
   return (
-    <section className="bg-[#F8FAFB] py-16 md:py-24 px-4 md:px-8 border-y border-[#E5E9EB] w-full">
-      <div className="max-w-5xl mx-auto">
+    <section className="bg-[#F8FAFB] py-16 md:py-24 border-y border-[#E5E9EB] w-full">
+      <LandingContainer>
         <h2 className="text-[24px] md:text-[32px] font-bold text-[#0F1419] text-center mb-10 md:mb-12 tracking-tight">
           Built with details that matter.
         </h2>
@@ -22,7 +23,7 @@ const DetailsSection: React.FC = () => {
             </div>
           ))}
         </div>
-      </div>
+      </LandingContainer>
     </section>
   );
 };

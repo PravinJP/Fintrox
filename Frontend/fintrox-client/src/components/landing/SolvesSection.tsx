@@ -1,9 +1,10 @@
 import React from 'react';
+import LandingContainer from './LandingContainer';
 
 const SolvesSection: React.FC = () => {
   return (
-    <section className="bg-[#F8FAFB] py-16 md:py-24 px-4 md:px-8 border-y border-[#E5E9EB] w-full">
-      <div className="max-w-6xl mx-auto">
+    <section className="bg-white py-16 md:py-24 border-y border-[#E5E9EB] w-full">
+      <LandingContainer>
         <div className="text-center mb-12 md:mb-16">
           <h2 className="text-[28px] md:text-[40px] font-bold text-[#0F1419] mb-4 tracking-tight">
             Lending without software is chaos.
@@ -44,7 +45,7 @@ const SolvesSection: React.FC = () => {
             </p>
           </div>
         </div>
-      </div>
+      </LandingContainer>
     </section>
   );
 };

@@ -1,10 +1,11 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import LandingContainer from './LandingContainer';
 
 const FinalCTASection: React.FC = () => {
   return (
-    <section className="bg-[#1B4332] py-16 md:py-20 px-4 md:px-8 text-center text-white w-full">
-      <div className="max-w-3xl mx-auto">
+    <section className="bg-[#1B4332] py-16 md:py-20 w-full">
+      <LandingContainer className="max-w-3xl text-center">
         <h2 className="text-[28px] md:text-[40px] font-bold text-white mb-4 tracking-tight">
           Bring order to your lending business.
         </h2>
@@ -17,7 +18,7 @@ const FinalCTASection: React.FC = () => {
         >
           Get started
         </Link>
-      </div>
+      </LandingContainer>
     </section>
   );
 };

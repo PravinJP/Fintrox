@@ -1,9 +1,10 @@
 import React from 'react';
+import LandingContainer from './LandingContainer';
 
 const ReportsShowcase: React.FC = () => {
   return (
-    <section className="bg-white py-16 md:py-24 px-4 md:px-8 max-w-6xl mx-auto w-full">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-16 items-center">
+    <section className="bg-white py-16 md:py-24 w-full">
+      <LandingContainer className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-16 items-center">
         <div>
           <span className="text-[13px] uppercase tracking-wider font-semibold text-[#2D6A4F] block mb-2">
             Reports
@@ -68,7 +69,7 @@ const ReportsShowcase: React.FC = () => {
             Export Summary (PDF / Excel)
           </button>
         </div>
-      </div>
+      </LandingContainer>
     </section>
   );
 };

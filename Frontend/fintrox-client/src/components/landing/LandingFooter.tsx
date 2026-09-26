@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import LandingContainer from './LandingContainer';
 
 const LandingFooter: React.FC = () => {
   const scrollToSection = (id: string) => {
@@ -13,7 +14,7 @@ const LandingFooter: React.FC = () => {
 
   return (
     <footer className="w-full bg-white border-t border-[#E5E9EB]">
-      <div className="max-w-[1280px] mx-auto px-4 md:px-6 pt-12 md:pt-16 pb-8 md:pb-12">
+      <LandingContainer className="pt-12 md:pt-16 pb-8 md:pb-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 md:gap-12">
           <div className="space-y-4">
             <Link to="/" className="flex items-center gap-2.5">
@@ -121,7 +122,7 @@ const LandingFooter: React.FC = () => {
             © 2025 Fintrox. All rights reserved.
           </p>
         </div>
-      </div>
+      </LandingContainer>
     </footer>
   );
 };
