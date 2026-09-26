@@ -36,12 +36,11 @@ const LandingNav: React.FC = () => {
       <div className="h-16 max-w-[1280px] mx-auto px-4 md:px-6 flex items-center justify-between">
         {/* Logo */}
         <Link to="/" className="flex items-center gap-2.5">
-          <div className="w-7 h-7 rounded bg-[#2D6A4F] flex items-center justify-center">
-            <span className="text-white font-bold text-sm leading-none">F</span>
-          </div>
-          <span className="font-semibold text-[#0F1419] text-lg tracking-tight">
-            Fintrox
-          </span>
+          <img
+            src="/logo.png"
+            alt="Fintrox"
+            className="h-8 w-auto object-contain"
+          />
         </Link>
 
         {/* Desktop Nav */}
@@ -73,7 +72,7 @@ const LandingNav: React.FC = () => {
           </Link>
         </div>
 
-        {/* Mobile Hamburger */}
+        
         <button
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           className="md:hidden flex h-10 w-10 items-center justify-center rounded text-[#0F1419] hover:bg-[#F4F6F8]"
