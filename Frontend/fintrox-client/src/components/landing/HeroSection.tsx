@@ -21,10 +21,10 @@ const HeroSection: React.FC = () => {
         }}
       ></div>
 
-      {/* Wider container to remove side gaps */}
-      <div className="relative w-full max-w-[1440px] mx-auto px-6 md:px-10 py-14 md:py-20">
+      {/* Original width: max-w-7xl (1280px) */}
+      <div className="relative max-w-7xl mx-auto px-4 md:px-8 py-14 md:py-20">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center">
-          {/* LEFT: Text (55%) */}
+          {/* LEFT: Text */}
           <div className="lg:col-span-6">
             <span className="text-[13px] uppercase tracking-wider font-semibold text-[#2D6A4F] mb-3 inline-flex items-center gap-2">
               <span className="w-1.5 h-1.5 rounded-full bg-[#2D6A4F]"></span>
@@ -63,7 +63,7 @@ const HeroSection: React.FC = () => {
             </p>
           </div>
 
-          {/* RIGHT: Dashboard image (45%) */}
+          {/* RIGHT: Dashboard image */}
           <div className="lg:col-span-6">
             <div className="relative">
               {/* Decorative dotted pattern */}

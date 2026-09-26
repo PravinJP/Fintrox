@@ -11,21 +11,22 @@ import ReportsShowcase from '../components/landing/ReportsShowcase';
 import RoleDashboardsSection from '../components/landing/RoleDashboardsSection';
 import SolvesSection from '../components/landing/SolvesSection';
 
-
 const LandingPage: React.FC = () => {
   return (
     <div className="w-full min-h-screen bg-white">
       <LandingNav />
       <main className="w-full pt-16">
-        <HeroSection />
-        <SolvesSection />
-        <FeaturesSection />
-        <CollectionsShowcase />
-        <ReportsShowcase />
-        <HowItWorksSection />
-        <RoleDashboardsSection />
-        <DetailsSection />
-        <FinalCTASection />
+        <div className="w-full mx-auto px-6 md:px-10 lg:px-16" style={{ maxWidth: 'clamp(1280px, 90vw, 1800px)' }}>
+          <HeroSection />
+          <SolvesSection />
+          <FeaturesSection />
+          <CollectionsShowcase />
+          <ReportsShowcase />
+          <HowItWorksSection />
+          <RoleDashboardsSection />
+          <DetailsSection />
+          <FinalCTASection />
+        </div>
       </main>
       <LandingFooter />
     </div>
