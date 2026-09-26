@@ -91,11 +91,7 @@ const Sidebar: React.FC = () => {
           })}
         </ul>
 
-        <div className="mt-auto mb-4 px-4">
-          <button className="w-full rounded-lg bg-[#2d6a4f] py-3 text-[14px] font-medium leading-[20px] text-white shadow-sm transition-colors hover:bg-[#3f6653]">
-            Upgrade Now
-          </button>
-        </div>
+        
       </nav>
 
       
