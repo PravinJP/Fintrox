@@ -37,11 +37,7 @@ const Dashboard: React.FC = () => {
         response = await dashboardApi.getOwnerDashboard();
       }
 
-      console.log('📥 Raw response:', response.data);
-
       const dashboardData = (response.data as any)?.data ?? response.data;
-      console.log('📊 Dashboard data:', dashboardData);
-
       setData(dashboardData);
       setError('');
       setNeedsOrganization(false);
@@ -66,10 +62,10 @@ const Dashboard: React.FC = () => {
           <div className="w-20 h-20 bg-[#ffdad6] rounded-full flex items-center justify-center mx-auto mb-4">
             <span className="material-symbols-outlined text-4xl text-[#93000a]">business</span>
           </div>
-          <h2 className="text-[24px] leading-[32px] font-semibold text-[#161d1f] mb-2">
+          <h2 className="text-[24px] font-semibold text-[#161d1f] mb-2">
             Create Your Organization
           </h2>
-          <p className="text-[14px] leading-[20px] text-[#404943] mb-6">
+          <p className="text-[14px] text-[#404943] mb-6">
             You need to create an organization before you can access the dashboard.
           </p>
           <button
@@ -108,14 +104,15 @@ const Dashboard: React.FC = () => {
 
   return (
     <div className="max-w-7xl mx-auto flex flex-col gap-6">
+      {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 mb-4">
         <div>
-          <h2 className="text-[24px] leading-[32px] font-bold text-[#161d1f] tracking-[-0.01em] md:text-[32px] md:leading-[40px]">
+          <h2 className="text-[24px] md:text-[32px] font-bold text-[#161d1f]">
             {isOwner && 'Dashboard Overview'}
             {isEmployee && 'My Dashboard'}
             {isLender && 'My Lending Dashboard'}
           </h2>
-          <p className="text-[14px] leading-[20px] text-[#404943] mt-1">
+          <p className="text-[14px] text-[#404943] mt-1">
             {isOwner && "Here's what's happening with your operations today."}
             {isEmployee && "Here's your collection summary and tasks for today."}
             {isLender && "Here's your lending business summary."}
@@ -151,6 +148,31 @@ const Dashboard: React.FC = () => {
           </>
         )}
 
+        {isEmployee && (
+          <>
+            <KPICard
+              label="Today's Collection"
+              value={`₹${data?.todayCollection?.toLocaleString() || 0}`}
+              icon="payments"
+            />
+            <KPICard
+              label="Target Achievement"
+              value={`${(data?.targetAchievementPercentage ?? 0).toFixed(1)}%`}
+              icon="trending_up"
+            />
+            <KPICard
+              label="Assigned Customers"
+              value={data?.assignedCustomers || 0}
+              icon="groups"
+            />
+            <KPICard
+              label="Pending Customers"
+              value={data?.pendingCustomers || 0}
+              icon="schedule"
+            />
+          </>
+        )}
+
         {isLender && (
           <>
             <KPICard
@@ -175,31 +197,6 @@ const Dashboard: React.FC = () => {
             />
           </>
         )}
-
-        {isEmployee && (
-          <>
-            <KPICard
-              label="Today's Collection"
-              value={`₹${data?.todayCollection?.toLocaleString() || 0}`}
-              icon="payments"
-            />
-            <KPICard
-              label="Target Achievement"
-              value={`${data?.targetAchievementPercentage || 0}%`}
-              icon="trending_up"
-            />
-            <KPICard
-              label="Customers Visited"
-              value={data?.visitedCustomers || 0}
-              icon="groups"
-            />
-            <KPICard
-              label="Pending Customers"
-              value={data?.pendingCustomers || 0}
-              icon="schedule"
-            />
-          </>
-        )}
       </div>
 
       {isOwner && (
@@ -210,7 +207,7 @@ const Dashboard: React.FC = () => {
       )}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <RecentCollections collections={data?.recentActivities || []} />
+        <RecentCollections collections={data?.recentActivities || data?.recentCollections || []} />
         {isOwner && <OverdueAlerts alerts={data?.overdueLoans || []} />}
       </div>
     </div>

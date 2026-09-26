@@ -15,20 +15,16 @@ const Login: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     try {
       const result = await dispatch(login({ email, password })).unwrap();
       console.log('✅ Login successful:', result);
-      
-      
-      if (result.userType === 'EMPLOYEE') {
-    navigate('/employee/dashboard');
-} else if (result.organizationId) {
-    navigate('/dashboard');
-} else {
-    navigate('/settings/organization');
-}
-      
+
+      if (result.organizationId) {
+        navigate('/dashboard');
+      } else {
+        navigate('/settings/organization');
+      }
     } catch (err: any) {
       console.error('❌ Login error:', err);
     }
@@ -53,7 +49,7 @@ const Login: React.FC = () => {
         </div>
         <div className="relative z-10 flex-1 flex items-center justify-center py-12">
           <div className="w-full max-w-md aspect-square rounded-2xl bg-[#e8eff1] flex items-center justify-center overflow-hidden border border-[#bfc9c1] shadow-sm relative">
-            <img 
+            <img
               className="w-full h-full object-cover opacity-90 transition-transform duration-1000 hover:scale-105"
               src="https://lh3.googleusercontent.com/aida-public/AB6AXuCbhQlW-3-9pJjlWett2sAR59nq03CVBVOlwI4z_mtDaPwimxka6720PCtuiKER_FgAZXv9LetYucDmtkkQLstMec7Aezu0gVF7StdX-qXprO05og_Uicox5yHKkQr84IcpUdux0o8teWCuzdXeBpFVYwOz2UUP0eGMuAsxa9pf07w_8BEli7F8A8ixHURVecJ76UkyMjcTiQH6WYUnCOEWCzakkQinapOAUGm_juisdcpI61Xcp4y8"
               alt="Financial growth illustration"

@@ -1,7 +1,5 @@
 package com.app.Fintrox.loan.service;
 
-
-
 import com.app.Fintrox.loan.dto.request.LoanRequest;
 import com.app.Fintrox.loan.dto.request.LoanUpdateRequest;
 import com.app.Fintrox.loan.dto.response.CustomerLoanSummary;
@@ -21,7 +19,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import com.app.Fintrox.loan.dto.response.InstallmentScheduleDto;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -42,19 +39,15 @@ public class LoanServiceImpl implements LoanService {
     @Override
     @Transactional
     public LoanResponse createLoan(LoanRequest request, Long userId, Long organizationId) {
-        // 1. Validate customer exists
         Customer customer = customerRepository.findById(request.getCustomerId())
                 .orElseThrow(() -> new ResourceNotFoundException("Customer not found"));
 
-        // 2. Check if customer belongs to this organization
         if (!customer.getOrganizationId().equals(organizationId)) {
             throw new BadRequestException("Customer does not belong to your organization");
         }
 
-        // 3. Create Loan entity
         Loan loan = loanMapper.toEntity(request, organizationId, userId);
 
-        // 4. Calculate loan details
         LocalDate startDate = request.getStartDate() != null ? request.getStartDate() : LocalDate.now();
         LoanCalculationResult calculation = loanCalculatorService.calculateLoan(
                 request.getPrincipalAmount(),
@@ -64,24 +57,20 @@ public class LoanServiceImpl implements LoanService {
                 startDate
         );
 
-        // 5. Set calculated values
         loan.setTotalInterest(calculation.getTotalInterest());
         loan.setTotalPayable(calculation.getTotalPayable());
         loan.setInstallmentAmount(calculation.getInstallmentAmount());
         loan.setTotalInstallments(calculation.getTotalInstallments());
         loan.setEndDate(calculation.getEndDate());
 
-        // 6. Set initial values
         loan.setAmountPaid(0.0);
         loan.setOutstandingBalance(calculation.getTotalPayable());
         loan.setInstallmentsPaid(0);
         loan.setStatus("ACTIVE");
         loan.setNextDueDate(calculation.getInstallmentSchedule().get(0).getDueDate());
 
-        // 7. Save loan
         Loan savedLoan = loanRepository.save(loan);
 
-        // 8. Create and save installments
         List<Installment> installments = new ArrayList<>();
         for (InstallmentResponse installmentDto : calculation.getInstallmentSchedule()) {
             Installment installment = Installment.builder()
@@ -95,7 +84,6 @@ public class LoanServiceImpl implements LoanService {
             installments.add(installmentRepository.save(installment));
         }
 
-        // 9. Update customer's financial summary (add loan)
         customerRepository.addLoan(customer.getId(), savedLoan.getPrincipalAmount());
         customerRepository.save(customer);
 
@@ -104,7 +92,6 @@ public class LoanServiceImpl implements LoanService {
 
         return loanMapper.toResponseWithSchedule(savedLoan, customer, installments);
     }
-
 
     @Override
     @Transactional
@@ -138,7 +125,7 @@ public class LoanServiceImpl implements LoanService {
         }
 
         LocalDate startDate = loan.getStartDate() != null ? loan.getStartDate() : LocalDate.now();
-        LoanCalculatorService.LoanCalculationResult calculation = loanCalculatorService.calculateLoan(
+        LoanCalculationResult calculation = loanCalculatorService.calculateLoan(
                 loan.getPrincipalAmount(),
                 loan.getInterestRate(),
                 loan.getTenureMonths(),
@@ -177,6 +164,7 @@ public class LoanServiceImpl implements LoanService {
 
         return loanMapper.toResponseWithSchedule(updatedLoan, customer, newInstallments);
     }
+
     @Override
     public LoanResponse getLoanById(Long id) {
         Loan loan = loanRepository.findById(id)
@@ -233,7 +221,6 @@ public class LoanServiceImpl implements LoanService {
     }
 
     @Override
-
     public List<LoanResponse> getOverdueLoans(Long organizationId) {
         List<Loan> loans = loanRepository.findOverdueLoansByOrganization(organizationId, LocalDate.now());
         return loans.stream()
@@ -267,7 +254,6 @@ public class LoanServiceImpl implements LoanService {
         loan.setActive(false);
         Loan updatedLoan = loanRepository.save(loan);
 
-        // Update customer's active loan count
         customerRepository.removeActiveLoan(loan.getCustomerId());
 
         Customer customer = customerRepository.findById(loan.getCustomerId()).orElse(null);
@@ -310,7 +296,6 @@ public class LoanServiceImpl implements LoanService {
 
         return loanMapper.toResponseWithSchedule(loan, customer, installments);
     }
-
 
     @Override
     public CustomerLoanSummary getCustomerLoanSummary(Long customerId) {

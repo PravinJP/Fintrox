@@ -38,15 +38,12 @@ public interface CustomerRepository extends JpaRepository<Customer, Long> {
     List<Customer> findByIsActiveTrue();
     List<Customer> findByIsBlockedTrue();
 
-    // ===== Existence Checks =====
     boolean existsByPhone(String phone);
     boolean existsByEmail(String email);
 
-    // ===== Count Queries =====
     long countByOrganizationId(Long organizationId);
     long countByOrganizationIdAndIsActiveTrue(Long organizationId);
 
-    // ===== Search Queries =====
     @Query("SELECT c FROM Customer c WHERE " +
             "LOWER(c.fullName) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR " +
             "c.phone LIKE CONCAT('%', :searchTerm, '%') OR " +
@@ -102,6 +99,11 @@ public interface CustomerRepository extends JpaRepository<Customer, Long> {
     @Query("UPDATE Customer c SET c.activeLoansCount = c.activeLoansCount - 1 " +
             "WHERE c.id = :customerId AND c.activeLoansCount > 0")
     void removeActiveLoan(@Param("customerId") Long customerId);
+
+
+List<Customer> findByAssignedEmployeeIdAndOrganizationId(Long employeeId, Long organizationId);
+
+long countByAssignedEmployeeId(Long employeeId);
 
 
 }

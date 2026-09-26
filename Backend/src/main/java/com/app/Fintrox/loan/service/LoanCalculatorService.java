@@ -1,7 +1,5 @@
 package com.app.Fintrox.loan.service;
 
-
-
 import com.app.Fintrox.loan.dto.response.InstallmentResponse;
 import org.springframework.stereotype.Service;
 
@@ -12,40 +10,35 @@ import java.util.List;
 @Service
 public class LoanCalculatorService {
 
-
     public LoanCalculationResult calculateLoan(Double principal, Double interestRate,
-                                               Integer tenureMonths, String loanType,
+                                               Integer tenure, String loanType,
                                                LocalDate startDate) {
 
         LoanCalculationResult result = new LoanCalculationResult();
 
+        String type = (loanType != null ? loanType.toUpperCase() : "MONTHLY");
 
-        Double totalInterest = principal * (interestRate / 100) * tenureMonths;
+        double totalInterest;
+        int totalInstallments;
 
-        // 2. Calculate total payable
-        Double totalPayable = principal + totalInterest;
-
-        // 3. Calculate installment amount based on loan type
-        Double installmentAmount;
-        Integer totalInstallments;
-
-        switch (loanType.toUpperCase()) {
+        switch (type) {
             case "DAILY":
-                totalInstallments = tenureMonths * 30;
-                installmentAmount = totalPayable / totalInstallments;
+                totalInterest = principal * (interestRate / 100.0) * (tenure / 30.0);
+                totalInstallments = tenure;
                 break;
             case "WEEKLY":
-                totalInstallments = tenureMonths * 4;
-                installmentAmount = totalPayable / totalInstallments;
+                totalInterest = principal * (interestRate / 100.0) * (tenure / 4.0);
+                totalInstallments = tenure;
                 break;
             case "MONTHLY":
             default:
-                totalInstallments = tenureMonths;
-                installmentAmount = totalPayable / totalInstallments;
+                totalInterest = principal * (interestRate / 100.0) * tenure;
+                totalInstallments = tenure;
                 break;
         }
 
-        // Round to 2 decimal places
+        double totalPayable = principal + totalInterest;
+        double installmentAmount = totalPayable / totalInstallments;
         installmentAmount = Math.round(installmentAmount * 100.0) / 100.0;
 
         result.setTotalInterest(totalInterest);
@@ -53,19 +46,16 @@ public class LoanCalculatorService {
         result.setInstallmentAmount(installmentAmount);
         result.setTotalInstallments(totalInstallments);
 
-        // 4. Generate installment schedule
         List<InstallmentResponse> schedule = generateSchedule(
-                totalPayable, installmentAmount, totalInstallments, loanType, startDate
+                totalPayable, installmentAmount, totalInstallments, type, startDate
         );
         result.setInstallmentSchedule(schedule);
 
-        // 5. Calculate end date
-        LocalDate endDate = calculateEndDate(startDate, loanType, totalInstallments);
+        LocalDate endDate = calculateEndDate(startDate, type, totalInstallments);
         result.setEndDate(endDate);
 
         return result;
     }
-
 
     private List<InstallmentResponse> generateSchedule(
             Double totalPayable, Double installmentAmount, Integer totalInstallments,
@@ -76,7 +66,6 @@ public class LoanCalculatorService {
         Double remaining = totalPayable;
 
         for (int i = 1; i <= totalInstallments; i++) {
-            // Calculate due date based on loan type
             switch (loanType.toUpperCase()) {
                 case "DAILY":
                     currentDate = currentDate.plusDays(1);
@@ -92,8 +81,7 @@ public class LoanCalculatorService {
 
             Double amount = installmentAmount;
             if (i == totalInstallments) {
-                // Adjust last installment to account for rounding
-                amount = Math.round((remaining) * 100.0) / 100.0;
+                amount = Math.round(remaining * 100.0) / 100.0;
             }
             remaining -= amount;
 
@@ -109,7 +97,6 @@ public class LoanCalculatorService {
 
         return schedule;
     }
-
 
     private LocalDate calculateEndDate(LocalDate startDate, String loanType, Integer totalInstallments) {
         LocalDate endDate = startDate;
@@ -128,16 +115,13 @@ public class LoanCalculatorService {
         return endDate;
     }
 
-
     public Double calculateOutstandingBalance(Double totalPayable, Double totalPaid) {
         return Math.round((totalPayable - totalPaid) * 100.0) / 100.0;
     }
 
-
     public boolean isOverdue(LocalDate nextDueDate) {
         return nextDueDate != null && nextDueDate.isBefore(LocalDate.now());
     }
-
 
     public static class LoanCalculationResult {
         private Double totalInterest;
@@ -147,7 +131,6 @@ public class LoanCalculatorService {
         private LocalDate endDate;
         private List<InstallmentResponse> installmentSchedule;
 
-        // Getters and Setters
         public Double getTotalInterest() { return totalInterest; }
         public void setTotalInterest(Double totalInterest) { this.totalInterest = totalInterest; }
         public Double getTotalPayable() { return totalPayable; }

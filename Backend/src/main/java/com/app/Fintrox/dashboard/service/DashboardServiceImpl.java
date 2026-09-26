@@ -34,7 +34,7 @@ public class DashboardServiceImpl implements DashboardService {
     private final EmployeeRepository employeeRepository;
     private final InstallmentRepository installmentRepository;
 
-    @Cacheable(value = "dashboard", key = "'dashboard_' + #organizationId")
+    @Cacheable(value = "dashboard", key = "'dashboard_v2_' + #organizationId")
     @Override
     public OwnerDashboardResponse getOwnerDashboard(Long organizationId) {
         log.info("=== CACHE MISS - Fetching from Database ===");
@@ -76,7 +76,6 @@ public class DashboardServiceImpl implements DashboardService {
                         .build());
             }
 
-            // Top performers
             List<Object[]> topData = collectionRepository.findTopPerformers(organizationId, monthStart, todayEnd);
             List<OwnerDashboardResponse.EmployeePerformanceDTO> topPerformers = new ArrayList<>();
             int limit = Math.min(topData.size(), 5);
@@ -102,7 +101,6 @@ public class DashboardServiceImpl implements DashboardService {
                 }
             }
 
-            // Recent activities
             List<Collection> recentCollections = collectionRepository.findRecentCollectionsByOrg(organizationId);
             List<OwnerDashboardResponse.RecentActivityDTO> recentActivities = new ArrayList<>();
             int actLimit = Math.min(recentCollections.size(), 10);
@@ -117,7 +115,6 @@ public class DashboardServiceImpl implements DashboardService {
                         .build());
             }
 
-            // Weekly trend
             List<OwnerDashboardResponse.DailyCollectionDTO> weeklyTrend = new ArrayList<>();
             for (int i = 6; i >= 0; i--) {
                 LocalDate d = today.minusDays(i);
@@ -157,6 +154,12 @@ public class DashboardServiceImpl implements DashboardService {
 
     @Override
     public EmployeeDashboardResponse getEmployeeDashboard(Long employeeId, Long organizationId) {
+        Employee employee = employeeRepository.findById(employeeId).orElse(null);
+        if (employee == null || !employee.getOrganizationId().equals(organizationId)) {
+            log.warn("Employee {} does not belong to organization {}", employeeId, organizationId);
+            return getEmptyEmployeeDashboard();
+        }
+
         log.info("Fetching employee dashboard for employee: {}", employeeId);
 
         try {
@@ -165,8 +168,6 @@ public class DashboardServiceImpl implements DashboardService {
             LocalDateTime todayEnd = today.atTime(LocalTime.MAX);
             LocalDateTime weekStart = today.minusDays(6).atStartOfDay();
             LocalDateTime monthStart = today.withDayOfMonth(1).atStartOfDay();
-
-            Employee employee = employeeRepository.findById(employeeId).orElse(null);
 
             Double todayCollection = collectionRepository.sumCollectionsByEmployeeBetween(
                     organizationId, employeeId, todayStart, todayEnd);
@@ -177,12 +178,53 @@ public class DashboardServiceImpl implements DashboardService {
 
             List<Customer> assignedCustomers = customerRepository.findByAssignedEmployeeId(employeeId);
 
-            Double monthlyTarget = employee != null && employee.getMonthlyTarget() != null
+            Double monthlyTarget = employee.getMonthlyTarget() != null
                     ? employee.getMonthlyTarget().doubleValue()
                     : 0.0;
             Double targetAchievement = monthlyTarget > 0
                     ? (monthlyCollection / monthlyTarget) * 100
                     : 0.0;
+
+            List<Collection> recentCollections = collectionRepository.findRecentCollectionsByEmployee(
+                    employeeId, monthStart, todayEnd, org.springframework.data.domain.PageRequest.of(0, 10)
+            );
+            List<EmployeeDashboardResponse.RecentCollectionDTO> recentCollectionDTOs = new ArrayList<>();
+            for (Collection c : recentCollections) {
+                Customer customer = customerRepository.findById(c.getCustomerId()).orElse(null);
+                recentCollectionDTOs.add(EmployeeDashboardResponse.RecentCollectionDTO.builder()
+                        .collectionId(c.getId())
+                        .customerName(customer != null ? customer.getFullName() : "Unknown")
+                        .amount(c.getAmount())
+                        .paymentMethod(c.getPaymentMethod())
+                        .collectedAt(c.getCreatedAt() != null ? c.getCreatedAt().toString() : "")
+                        .build());
+            }
+
+            List<EmployeeDashboardResponse.CustomerVisitDTO> todayCustomers = new ArrayList<>();
+            for (Customer c : assignedCustomers) {
+                todayCustomers.add(EmployeeDashboardResponse.CustomerVisitDTO.builder()
+                        .customerId(c.getId())
+                        .customerName(c.getFullName())
+                        .phone(c.getPhone())
+                        .address(c.getAddress())
+                        .outstandingBalance(c.getOutstandingBalance())
+                        .dueAmount(0.0)
+                        .priority(1)
+                        .build());
+            }
+
+            List<EmployeeDashboardResponse.OverdueCustomerDTO> overdueCustomerDTOs = new ArrayList<>();
+            for (Customer c : assignedCustomers) {
+                if (c.getOutstandingBalance() != null && c.getOutstandingBalance() > 0) {
+                    overdueCustomerDTOs.add(EmployeeDashboardResponse.OverdueCustomerDTO.builder()
+                            .customerId(c.getId())
+                            .customerName(c.getFullName())
+                            .phone(c.getPhone())
+                            .overdueAmount(c.getOutstandingBalance())
+                            .daysOverdue(0)
+                            .build());
+                }
+            }
 
             return EmployeeDashboardResponse.builder()
                     .todayCollection(todayCollection != null ? todayCollection : 0.0)
@@ -194,11 +236,11 @@ public class DashboardServiceImpl implements DashboardService {
                     .assignedCustomers(assignedCustomers.size())
                     .visitedCustomers(0)
                     .pendingCustomers(assignedCustomers.size())
-                    .routeId(employee != null ? employee.getRouteId() : null)
+                    .routeId(employee.getRouteId())
                     .routeName(null)
-                    .todayCustomers(new ArrayList<>())
-                    .recentCollections(new ArrayList<>())
-                    .overdueCustomers(new ArrayList<>())
+                    .todayCustomers(todayCustomers)
+                    .recentCollections(recentCollectionDTOs)
+                    .overdueCustomers(overdueCustomerDTOs)
                     .build();
 
         } catch (Exception e) {

@@ -58,7 +58,6 @@ public class AuthServiceImpl implements AuthService {
             user.setLastLogin(LocalDateTime.now());
             userRepository.save(user);
 
-            // Generate tokens
             String accessToken = jwtTokenProvider.generateAccessToken(authentication);
             String refreshToken = jwtTokenProvider.generateRefreshToken(authentication);
 
@@ -85,17 +84,16 @@ public class AuthServiceImpl implements AuthService {
     @Override
     @Transactional
     public AuthResponse register(RegisterRequest request) {
-        // Check if email already exists
+        
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new BadRequestException("Email already registered");
         }
 
-        // Check if phone already exists
+        
         if (userRepository.existsByPhone(request.getPhone())) {
             throw new BadRequestException("Phone number already registered");
         }
 
-        // ✅ FIXED: Create user with proper userType
         UserType userType;
         try {
             userType = UserType.valueOf(request.getUserType().toUpperCase());
@@ -108,13 +106,12 @@ public class AuthServiceImpl implements AuthService {
                 .email(request.getEmail())
                 .phone(request.getPhone())
                 .password(passwordEncoder.encode(request.getPassword()))
-                .userType(userType) // ✅ Explicitly set userType
+                .userType(userType) 
                 .isActive(true)
                 .isEmailVerified(false)
                 .isPhoneVerified(false)
                 .build();
 
-        // ✅ Log the user before saving for debugging
         log.info("Saving user: email={}, userType={}, fullName={}",
                 user.getEmail(), user.getUserType(), user.getFullName());
 
@@ -122,7 +119,6 @@ public class AuthServiceImpl implements AuthService {
 
         log.info("User registered: {}", savedUser.getEmail());
 
-        // Auto-login after registration
         LoginRequest loginRequest = LoginRequest.builder()
                 .email(request.getEmail())
                 .password(request.getPassword())
@@ -173,9 +169,7 @@ public class AuthServiceImpl implements AuthService {
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
-        // Generate reset token
         String resetToken = jwtTokenProvider.generatePasswordResetToken(request.getEmail());
-        // TODO: Send email with reset link
         log.info("Password reset token generated for: {}", request.getEmail());
     }
 

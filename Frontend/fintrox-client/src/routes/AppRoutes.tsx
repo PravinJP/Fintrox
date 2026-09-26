@@ -1,21 +1,22 @@
-
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-import type { RootState } from '../store/store';
-import LandingPage from '../pages/LandingPage';
-import Dashboard from '../pages/Dashboard';
-import DashboardLayout from '../components/layout/DashboardLayout';
-import CreateOrganization from '../components/settings/CreateOrganization';
-import ProtectedRoute from './ProtectedRoute';
 import Login from '../components/auth/Login';
 import Register from '../components/auth/Register';
-import Employees from '../pages/Employees';
-import RoutesPage from '../pages/Routes';
-import Customers from '../pages/Customers';
-import Loans from '../pages/Loans';
+import DashboardLayout from '../components/layout/DashboardLayout';
+import CreateOrganization from '../components/settings/CreateOrganization';
 import Collections from '../pages/Collections';
+import Customers from '../pages/Customers';
+import Dashboard from '../pages/Dashboard';
+import Employees from '../pages/Employees';
+import LandingPage from '../pages/LandingPage';
+import Loans from '../pages/Loans';
 import Reports from '../pages/Reports';
+import RoutesPage from '../pages/Routes';
+import type { RootState } from '../store/store';
+import ProtectedRoute from './ProtectedRoute';
+import RoleBasedRoute from './RoleBasedRoute';
+
 
 const AppRoutes: React.FC = () => {
   const { isAuthenticated, loading } = useSelector((state: RootState) => state.auth);
@@ -33,7 +34,7 @@ const AppRoutes: React.FC = () => {
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
       <Route path="/" element={<LandingPage />} />
-      
+
       <Route
         path="/settings/organization"
         element={isAuthenticated ? <CreateOrganization /> : <Navigate to="/login" replace />}
@@ -41,18 +42,29 @@ const AppRoutes: React.FC = () => {
 
       <Route element={<ProtectedRoute />}>
         <Route element={<DashboardLayout />}>
+          {/* Shared routes (all roles) */}
           <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/employees" element={<Employees />} />
           <Route path="/routes" element={<RoutesPage />} />
           <Route path="/customers" element={<Customers />} />
           <Route path="/loans" element={<Loans />} />
           <Route path="/collections" element={<Collections />} />
-          <Route path="/reports" element={<Reports />} />
 
+          {/* Owner-only routes */}
+          <Route element={<RoleBasedRoute allowedRoles={['OWNER']} />}>
+            <Route path="/employees" element={<Employees />} />
+          </Route>
+
+          {/* Owner + Individual Lender routes */}
+          <Route element={<RoleBasedRoute allowedRoles={['OWNER', 'INDIVIDUAL_LENDER']} />}>
+            <Route path="/reports" element={<Reports />} />
+          </Route>
         </Route>
       </Route>
-      
-      <Route path="*" element={<Navigate to="/" replace />} />
+
+      <Route
+        path="*"
+        element={<Navigate to={isAuthenticated ? '/dashboard' : '/login'} replace />}
+      />
     </Routes>
   );
 };

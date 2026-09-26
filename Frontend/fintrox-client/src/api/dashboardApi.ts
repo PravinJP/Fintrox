@@ -1,9 +1,8 @@
-import api from "./axiosConfig";
-
 export interface DashboardData {
   todayCollection?: number;
   todayCollectionCount?: number;
   weeklyCollection?: number;
+  monthlyCollection?: number;
   totalOutstanding?: number;
   activeLoansCount?: number;
   totalEmployees?: number;
@@ -15,20 +14,19 @@ export interface DashboardData {
   recentActivities?: any[];
   weeklyTrend?: any[];
 
+  targetAchievementPercentage?: number;
+  assignedCustomers?: number;
+  pendingCustomers?: number;
+  visitedCustomers?: number;
+  todayVisits?: number;
+  monthlyTarget?: number;
+
   totalLoanAmountGiven?: number;
   totalAmountReceived?: number;
   outstandingBalance?: number;
   activeLoans?: number;
 
-  targetAchievementPercentage?: number;
-  visitedCustomers?: number;
-  pendingCustomers?: number;
-  monthlyTarget?: number;
-  monthlyCollection?: number;
-  todayVisits?: number;
-
   recentCollections?: any[];
-  alerts?: any[];
 }
 
 export interface ApiResponse<T> {
