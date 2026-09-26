@@ -15,11 +15,10 @@ const DashboardHeader: React.FC = () => {
         <img
           src="/logo.png"
           alt="Fintrox"
-          className="h-8 w-auto object-contain brightness-0 invert"
+          className="h-8 w-auto object-contain "
         />
       </div>
 
-      {/* Right: Notifications + Avatar */}
       <div className="flex items-center gap-4 text-white">
         <button className="relative hover:opacity-80 transition-opacity">
           <span className="material-symbols-outlined">notifications</span>
