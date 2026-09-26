@@ -19,7 +19,6 @@ const Sidebar: React.FC = () => {
     setIsMobileMenuOpen(false);
   }, [location.pathname]);
 
-  // Prevent body scroll when mobile menu is open
   useEffect(() => {
     if (isMobileMenuOpen) {
       document.body.style.overflow = 'hidden';
