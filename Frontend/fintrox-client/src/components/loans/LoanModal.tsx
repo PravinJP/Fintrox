@@ -53,6 +53,24 @@ const LoanModal: React.FC<LoanModalProps> = ({
     setErrors({});
   }, [loan, isOpen]);
 
+  const getTenureLabel = (loanType: string) => {
+    switch (loanType) {
+      case 'DAILY': return 'Tenure (Days)';
+      case 'WEEKLY': return 'Tenure (Weeks)';
+      case 'MONTHLY': return 'Tenure (Months)';
+      default: return 'Tenure';
+    }
+  };
+
+  const getTenurePlaceholder = (loanType: string) => {
+    switch (loanType) {
+      case 'DAILY': return '30';
+      case 'WEEKLY': return '12';
+      case 'MONTHLY': return '6';
+      default: return '6';
+    }
+  };
+
   const handleChange = (field: keyof CreateLoanRequest, value: any) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
     if (errors[field]) {
@@ -161,7 +179,7 @@ const LoanModal: React.FC<LoanModalProps> = ({
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
-                  Tenure (Months) *
+                  {getTenureLabel(formData.loanType)} *
                 </label>
                 <input
                   className={`w-full text-sm bg-slate-50 border rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-emerald-700/20 focus:border-emerald-700 ${
@@ -170,7 +188,7 @@ const LoanModal: React.FC<LoanModalProps> = ({
                   type="number"
                   value={formData.tenureMonths || ''}
                   onChange={(e) => handleChange('tenureMonths', parseInt(e.target.value) || 0)}
-                  placeholder="12"
+                  placeholder={getTenurePlaceholder(formData.loanType)}
                 />
                 {errors.tenureMonths && <p className="text-red-500 text-xs mt-1">{errors.tenureMonths}</p>}
               </div>
