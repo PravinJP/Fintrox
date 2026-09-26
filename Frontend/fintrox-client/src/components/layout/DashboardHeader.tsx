@@ -13,7 +13,7 @@ const DashboardHeader: React.FC = () => {
           <span className="material-symbols-outlined">menu</span>
         </button>
         <img
-          src="/logo2.png"
+          src="/logo3.png"
           alt="Fintrox"
           className="h-8 w-auto object-contain "
         />
