@@ -15,7 +15,6 @@ const Sidebar: React.FC = () => {
     { path: '/reports', label: 'Reports', icon: 'analytics' },
   ];
 
-  // Close mobile menu when route changes
   useEffect(() => {
     setIsMobileMenuOpen(false);
   }, [location.pathname]);
@@ -38,7 +37,7 @@ const Sidebar: React.FC = () => {
 
   return (
     <>
-      {/* ============ DESKTOP SIDEBAR ============ */}
+      
       <nav
         className="
           hidden
@@ -100,7 +99,7 @@ const Sidebar: React.FC = () => {
         </div>
       </nav>
 
-      {/* ============ MOBILE HEADER (hamburger) ============ */}
+      
       <header
         className="
           fixed
@@ -154,7 +153,6 @@ const Sidebar: React.FC = () => {
         <div className="w-10" />
       </header>
 
-      {/* ============ MOBILE SLIDE-IN MENU ============ */}
       {isMobileMenuOpen && (
         <div
           className="
