@@ -50,7 +50,7 @@ const Login: React.FC = () => {
           <div className="w-full max-w-md aspect-square rounded-2xl bg-[#e8eff1] flex items-center justify-center overflow-hidden border border-[#bfc9c1] shadow-sm relative">
             <img
               className="w-full h-full object-cover opacity-90 transition-transform duration-1000 hover:scale-105"
-              src="https://lh3.googleusercontent.com/aida-public/AB6AXuCbhQlW-3-9pJjlWett2sAR59nq03CVBVOlwI4z_mtDaPwimxka6720PCtuiKER_FgAZXv9LetYucDmtkkQLstMec7Aezu0gVF7StdX-qXprO05og_Uicox5yHKkQr84IcpUdux0o8teWCuzdXeBpFVYwOz2UUP0eGMuAsxa9pf07w_8BEli7F8A8ixHURVecJ76UkyMjcTiQH6WYUnCOEWCzakkQinapOAUGm_juisdcpI61Xcp4y8"
+              src="/login-hero (3).png"
               alt="Financial growth illustration"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-[#eef5f7] via-transparent to-transparent opacity-50"></div>
