@@ -9,6 +9,7 @@ import com.app.Fintrox.Auth.dto.response.UserResponse;
 import com.app.Fintrox.Auth.entity.User;
 import com.app.Fintrox.Auth.mapper.UserMapper;
 import com.app.Fintrox.Auth.repository.UserRepository;
+import com.app.Fintrox.common.service.EmailService;
 import com.app.Fintrox.security.auth.JwtTokenProvider;
 import com.app.Fintrox.security.permissions.UserType;
 import com.app.Fintrox.common.exceptions.BadRequestException;
@@ -164,13 +165,18 @@ public class AuthServiceImpl implements AuthService {
         log.info("User logged out");
     }
 
+    private final EmailService emailService;
+
     @Override
     public void forgotPassword(ForgotPasswordRequest request) {
         User user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("No account found with this email"));
 
         String resetToken = jwtTokenProvider.generatePasswordResetToken(request.getEmail());
-        log.info("Password reset token generated for: {}", request.getEmail());
+
+        emailService.sendPasswordResetEmail(request.getEmail(), resetToken);
+
+        log.info("Password reset email sent to: {}", request.getEmail());
     }
 
     @Override

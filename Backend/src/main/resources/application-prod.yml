@@ -37,9 +37,29 @@ spring:
           max-idle: 8
           min-idle: 0
 
+  mail:
+    host: ${MAIL_HOST:smtp.gmail.com}
+    port: ${MAIL_PORT:587}
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+          connectiontimeout: 5000
+          timeout: 5000
+          writetimeout: 5000
+
   jackson:
     serialization:
       indent-output: false
+
+app:
+  frontend:
+    url: ${FRONTEND_URL:http://localhost:5173}
 
 server:
   port: ${PORT:8080}
@@ -56,6 +76,7 @@ logging:
     org.springframework.web: WARN
     org.hibernate.SQL: INFO
     org.springframework.data.redis: DEBUG
+    org.springframework.mail: DEBUG
 
 jwt:
   secret: ${JWT_SECRET}

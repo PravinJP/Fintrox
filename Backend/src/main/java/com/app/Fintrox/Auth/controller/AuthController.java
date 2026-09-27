@@ -26,9 +26,6 @@ public class AuthController {
 
     private final AuthService authService;
 
-    // ===== Authentication Endpoints =====
-
-
     @PostMapping("/register")
     public ResponseEntity<ApiResponse<AuthResponse>> register(
             @Valid @RequestBody RegisterRequest request) {
@@ -53,7 +50,6 @@ public class AuthController {
     public ResponseEntity<ApiResponse<AuthResponse>> refreshToken(
             @RequestHeader("Authorization") String refreshToken) {
         log.info("Refresh token request");
-        // Remove "Bearer " prefix if present
         String token = refreshToken.startsWith("Bearer ") ? refreshToken.substring(7) : refreshToken;
         AuthResponse response = authService.refreshToken(token);
         return ResponseEntity.ok(ApiResponse.success("Token refreshed", response));
@@ -71,7 +67,7 @@ public class AuthController {
         return ResponseEntity.ok(ApiResponse.success("Logout successful"));
     }
 
-    // ===== Password Management Endpoints =====
+
 
 
     @PostMapping("/forgot-password")

@@ -16,6 +16,8 @@ import RoutesPage from '../pages/Routes';
 import type { RootState } from '../store/store';
 import ProtectedRoute from './ProtectedRoute';
 import RoleBasedRoute from './RoleBasedRoute';
+import ForgotPassword from '../pages/auth/ForgotPassword';
+import ResetPassword from '../pages/auth/ResetPassword';
 
 
 const AppRoutes: React.FC = () => {
@@ -33,6 +35,8 @@ const AppRoutes: React.FC = () => {
     <Routes>
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="/" element={<LandingPage />} />
 
       <Route

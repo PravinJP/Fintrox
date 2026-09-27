@@ -25,7 +25,7 @@ const Login: React.FC = () => {
         navigate('/settings/organization');
       }
     } catch (err) {
-      // Silent in production — error shown via Redux state
+      // Silent — error shown via Redux state
     }
   };
 
@@ -109,9 +109,12 @@ const Login: React.FC = () => {
                 <label className="block text-[12px] leading-[16px] font-medium tracking-[0.02em] text-[#404943]">
                   Password
                 </label>
-                <a className="text-[12px] leading-[16px] font-medium tracking-[0.02em] text-[#2d6a4f] hover:text-[#0f5238] transition-colors" href="#">
+                <Link
+                  to="/forgot-password"
+                  className="text-[12px] leading-[16px] font-medium tracking-[0.02em] text-[#2d6a4f] hover:text-[#0f5238] transition-colors"
+                >
                   Forgot password?
-                </a>
+                </Link>
               </div>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
