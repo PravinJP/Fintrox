@@ -1,17 +1,12 @@
 import axios from 'axios';
 
-
-const API_URL = import.meta.env.VITE_API_URL || 'https://fintrox.onrender.com/api';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://fintrox.onrender.com/api';
 
 const api = axios.create({
-  baseURL: API_URL,
-  headers: {
-    'Content-Type': 'application/json',
-    'Accept': 'application/json',
-  },
-  timeout: 30000, 
+  baseURL: API_BASE_URL,
+  headers: { 'Content-Type': 'application/json' },
+  timeout: 60000,
 });
-
 
 api.interceptors.request.use(
   (config) => {
@@ -19,24 +14,22 @@ api.interceptors.request.use(
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
-    console.log('🚀 API Request:', config.method?.toUpperCase(), config.url);
     return config;
   },
   (error) => Promise.reject(error)
 );
 
-
 api.interceptors.response.use(
-  (response) => {
-    console.log('✅ API Response:', response.status, response.config.url);
-    return response;
-  },
+  (response) => response,
   (error) => {
-    console.error('❌ API Error:', error.message);
-    if (error.response?.status === 401) {
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-      window.location.href = '/login';
+    if (error.code === 'ECONNABORTED') {
+      error.userMessage = 'Server is waking up. This takes about 30 seconds on the first request. Please wait...';
+    } else if (!error.response) {
+      error.userMessage = 'Cannot reach the server. Please check your connection.';
+    } else if (error.response?.status === 401) {
+      error.userMessage = error.response?.data?.message || 'Invalid credentials';
+    } else {
+      error.userMessage = error.response?.data?.message || 'Something went wrong';
     }
     return Promise.reject(error);
   }

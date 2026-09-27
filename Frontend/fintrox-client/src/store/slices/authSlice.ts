@@ -27,7 +27,9 @@ export const login = createAsyncThunk(
       localStorage.setItem('user', JSON.stringify(result));
       return result;
     } catch (error: any) {
-      return rejectWithValue(error.response?.data?.message || 'Login failed');
+      return rejectWithValue(
+        error.userMessage || error.response?.data?.message || 'Login failed'
+      );
     }
   }
 );
@@ -42,7 +44,9 @@ export const register = createAsyncThunk(
       localStorage.setItem('user', JSON.stringify(result));
       return result;
     } catch (error: any) {
-      return rejectWithValue(error.response?.data?.message || 'Registration failed');
+      return rejectWithValue(
+        error.userMessage || error.response?.data?.message || 'Registration failed'
+      );
     }
   }
 );

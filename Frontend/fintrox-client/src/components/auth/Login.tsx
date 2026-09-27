@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, Link } from 'react-router-dom';
 import { login } from '../../store/slices/authSlice';
@@ -9,9 +9,20 @@ const Login: React.FC = () => {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
+  const [slowRequest, setSlowRequest] = useState(false);
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
   const { loading, error } = useSelector((state: RootState) => state.auth);
+
+  useEffect(() => {
+    if (!loading) {
+      setSlowRequest(false);
+      return;
+    }
+
+    const timer = window.setTimeout(() => setSlowRequest(true), 5000);
+    return () => window.clearTimeout(timer);
+  }, [loading]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -25,14 +36,20 @@ const Login: React.FC = () => {
         navigate('/settings/organization');
       }
     } catch (err) {
-      // Silent — error shown via Redux state
+      // Error shown via Redux state
     }
   };
 
   return (
     <div className="h-screen w-full flex bg-[#f4fafd]">
       <div className="hidden lg:flex w-1/2 flex-col justify-between p-12 bg-[#eef5f7] border-r border-[#dde4e6] relative overflow-hidden">
-        <div className="absolute inset-0 opacity-10 pointer-events-none" style={{ background: 'radial-gradient(circle at 100% 100%, #2d6a4f 0%, transparent 50%)' }}></div>
+        <div
+          className="absolute inset-0 opacity-10 pointer-events-none"
+          style={{
+            background:
+              'radial-gradient(circle at 100% 100%, #2d6a4f 0%, transparent 50%)',
+          }}
+        ></div>
         <div className="relative z-10">
           <div className="flex items-center gap-2 mb-4">
             <span className="material-symbols-outlined text-[#2d6a4f] text-4xl icon-fill-1">
@@ -62,6 +79,7 @@ const Login: React.FC = () => {
           </p>
         </div>
       </div>
+
       <div className="w-full lg:w-1/2 flex items-center justify-center p-4 md:p-12 relative">
         <div className="absolute top-4 left-4 lg:hidden flex items-center gap-2">
           <span className="material-symbols-outlined text-[#2d6a4f] text-3xl icon-fill-1">
@@ -71,6 +89,7 @@ const Login: React.FC = () => {
             Fintrox
           </span>
         </div>
+
         <div className="w-full max-w-[440px] bg-white rounded-[12px] p-8 shadow-[0_4px_12px_rgba(45,106,79,0.05)] border border-[#bfc9c1]/30">
           <div className="mb-8">
             <h2 className="text-[24px] leading-[32px] font-semibold text-[#161d1f] tracking-[-0.01em] mb-2">
@@ -80,11 +99,28 @@ const Login: React.FC = () => {
               Enter your credentials to access your dashboard.
             </p>
           </div>
+
           {error && (
             <div className="bg-[#ffdad6] text-[#93000a] p-3 rounded-lg mb-4 text-sm">
               {error}
             </div>
           )}
+
+          {loading && slowRequest && (
+            <div className="bg-[#fef3c7] border border-[#fcd34d] text-[#92400e] p-3 rounded-lg mb-4 text-sm flex items-start gap-2">
+              <span className="material-symbols-outlined text-[18px] shrink-0">
+                hourglass_top
+              </span>
+              <div>
+                <p className="font-semibold">Server is waking up...</p>
+                <p className="text-xs mt-1">
+                  This is the first request after a period of inactivity. It may take
+                  up to a minute on Render's free tier.
+                </p>
+              </div>
+            </div>
+          )}
+
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
               <label className="block text-[12px] leading-[16px] font-medium tracking-[0.02em] text-[#404943] mb-1.5">
@@ -92,7 +128,9 @@ const Login: React.FC = () => {
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <span className="material-symbols-outlined text-[#bfc9c1] text-[20px]">mail</span>
+                  <span className="material-symbols-outlined text-[#bfc9c1] text-[20px]">
+                    mail
+                  </span>
                 </div>
                 <input
                   type="email"
@@ -104,6 +142,7 @@ const Login: React.FC = () => {
                 />
               </div>
             </div>
+
             <div>
               <div className="flex items-center justify-between mb-1.5">
                 <label className="block text-[12px] leading-[16px] font-medium tracking-[0.02em] text-[#404943]">
@@ -118,7 +157,9 @@ const Login: React.FC = () => {
               </div>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <span className="material-symbols-outlined text-[#bfc9c1] text-[20px]">lock</span>
+                  <span className="material-symbols-outlined text-[#bfc9c1] text-[20px]">
+                    lock
+                  </span>
                 </div>
                 <input
                   type={showPassword ? 'text' : 'password'}
@@ -139,6 +180,7 @@ const Login: React.FC = () => {
                 </button>
               </div>
             </div>
+
             <div className="flex items-center">
               <input
                 type="checkbox"
@@ -147,10 +189,14 @@ const Login: React.FC = () => {
                 className="h-4 w-4 rounded border-[#bfc9c1] text-[#2d6a4f] focus:ring-[#2d6a4f] bg-[#f4fafd]"
                 id="remember-me"
               />
-              <label className="ml-2 block text-[14px] leading-[20px] text-[#404943]" htmlFor="remember-me">
+              <label
+                className="ml-2 block text-[14px] leading-[20px] text-[#404943]"
+                htmlFor="remember-me"
+              >
                 Remember me
               </label>
             </div>
+
             <div className="pt-2">
               <button
                 type="submit"
@@ -161,10 +207,14 @@ const Login: React.FC = () => {
               </button>
             </div>
           </form>
+
           <div className="mt-8 text-center">
             <p className="text-[14px] leading-[20px] text-[#404943]">
               Don't have an account?{' '}
-              <Link to="/register" className="text-[12px] leading-[16px] font-semibold tracking-[0.02em] text-[#2d6a4f] hover:text-[#0f5238] transition-colors underline decoration-[#2d6a4f]/30 underline-offset-4">
+              <Link
+                to="/register"
+                className="text-[12px] leading-[16px] font-semibold tracking-[0.02em] text-[#2d6a4f] hover:text-[#0f5238] transition-colors underline decoration-[#2d6a4f]/30 underline-offset-4"
+              >
                 Sign Up
               </Link>
             </p>
