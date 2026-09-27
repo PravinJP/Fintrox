@@ -15,6 +15,7 @@ import com.app.Fintrox.loan.repository.InstallmentRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -249,17 +250,51 @@ public class DashboardServiceImpl implements DashboardService {
         }
     }
 
+
     @Override
     public LenderDashboardResponse getLenderDashboard(Long organizationId) {
         log.info("Fetching lender dashboard for organization: {}", organizationId);
 
         try {
+            LocalDate today = LocalDate.now();
+            LocalDateTime monthStart = today.withDayOfMonth(1).atStartOfDay();
+            LocalDateTime todayEnd = today.atTime(LocalTime.MAX);
+
             Long totalCustomers = customerRepository.countByOrganizationId(organizationId);
             Double totalLoanAmountGiven = loanRepository.getTotalLoanAmountByOrganization(organizationId);
             Double totalAmountReceived = collectionRepository.getTotalCollectionByOrganization(organizationId);
             Double totalOutstanding = loanRepository.getTotalOutstandingBalance(organizationId);
             Long activeLoansCount = loanRepository.countByOrganizationIdAndStatus(organizationId, "ACTIVE");
             Long overdueLoansCount = loanRepository.countByOrganizationIdAndStatus(organizationId, "OVERDUE");
+
+            List<Loan> recentLoans = loanRepository.findRecentLoansByOrganization(organizationId, PageRequest.of(0, 10));
+            List<LenderDashboardResponse.RecentLoanDTO> recentLoanDTOs = new ArrayList<>();
+            for (Loan loan : recentLoans) {
+                Customer customer = customerRepository.findById(loan.getCustomerId()).orElse(null);
+                recentLoanDTOs.add(LenderDashboardResponse.RecentLoanDTO.builder()
+                        .loanId(loan.getId())
+                        .loanNumber(loan.getLoanNumber())
+                        .customerName(customer != null ? customer.getFullName() : "Unknown")
+                        .amount(loan.getPrincipalAmount())
+                        .status(loan.getStatus())
+                        .createdAt(loan.getCreatedAt() != null ? loan.getCreatedAt().toString() : "")
+                        .build());
+            }
+
+            // Fetch recent collections
+            List<Collection> recentCollections = collectionRepository.findRecentCollectionsByOrg(organizationId);
+            List<LenderDashboardResponse.RecentCollectionDTO> recentCollectionDTOs = new ArrayList<>();
+            int limit = Math.min(recentCollections.size(), 10);
+            for (int i = 0; i < limit; i++) {
+                Collection c = recentCollections.get(i);
+                Customer customer = customerRepository.findById(c.getCustomerId()).orElse(null);
+                recentCollectionDTOs.add(LenderDashboardResponse.RecentCollectionDTO.builder()
+                        .collectionId(c.getId())
+                        .customerName(customer != null ? customer.getFullName() : "Unknown")
+                        .amount(c.getAmount())
+                        .collectedAt(c.getCreatedAt() != null ? c.getCreatedAt().toString() : "")
+                        .build());
+            }
 
             return LenderDashboardResponse.builder()
                     .totalLoanAmountGiven(totalLoanAmountGiven != null ? totalLoanAmountGiven : 0.0)
@@ -268,8 +303,8 @@ public class DashboardServiceImpl implements DashboardService {
                     .activeLoans(activeLoansCount != null ? activeLoansCount.intValue() : 0)
                     .totalCustomers(totalCustomers != null ? totalCustomers.intValue() : 0)
                     .overdueLoans(overdueLoansCount != null ? overdueLoansCount.intValue() : 0)
-                    .recentLoans(new ArrayList<>())
-                    .recentCollections(new ArrayList<>())
+                    .recentLoans(recentLoanDTOs)
+                    .recentCollections(recentCollectionDTOs)
                     .upcomingPayments(new ArrayList<>())
                     .build();
 
@@ -278,7 +313,6 @@ public class DashboardServiceImpl implements DashboardService {
             return getEmptyLenderDashboard();
         }
     }
-
     private OwnerDashboardResponse getEmptyOwnerDashboard() {
         return OwnerDashboardResponse.builder()
                 .todayCollection(0.0)

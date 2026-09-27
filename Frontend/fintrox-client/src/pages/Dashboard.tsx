@@ -104,7 +104,6 @@ const Dashboard: React.FC = () => {
 
   return (
     <div className="max-w-7xl mx-auto flex flex-col gap-6">
-      {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 mb-4">
         <div>
           <h2 className="text-[24px] md:text-[32px] font-bold text-[#161d1f]">
@@ -207,7 +206,13 @@ const Dashboard: React.FC = () => {
       )}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <RecentCollections collections={data?.recentActivities || data?.recentCollections || []} />
+        <RecentCollections
+          collections={
+            isOwner
+              ? data?.recentActivities || []
+              : data?.recentCollections || []
+          }
+        />
         {isOwner && <OverdueAlerts alerts={data?.overdueLoans || []} />}
       </div>
     </div>

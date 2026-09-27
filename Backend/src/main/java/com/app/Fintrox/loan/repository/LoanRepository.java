@@ -1,6 +1,7 @@
 package com.app.Fintrox.loan.repository;
 
 import com.app.Fintrox.loan.entity.Loan;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -61,6 +62,9 @@ public interface LoanRepository extends JpaRepository<Loan, Long> {
 
     @Query("SELECT l FROM Loan l WHERE l.organizationId = :orgId AND l.status = 'OVERDUE' ORDER BY l.nextDueDate ASC")
     List<Loan> findOverdueLoans(@Param("orgId") Long orgId);
+
+    @Query("SELECT l FROM Loan l WHERE l.organizationId = :orgId ORDER BY l.createdAt DESC")
+    List<Loan> findRecentLoansByOrganization(@Param("orgId") Long orgId, Pageable pageable);
 
     @Query("SELECT l FROM Loan l WHERE l.organizationId = :orgId ORDER BY l.createdAt DESC")
     List<Loan> findRecentLoans(@Param("orgId") Long orgId, org.springframework.data.domain.Pageable pageable);
