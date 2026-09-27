@@ -35,12 +35,10 @@ public class CustomerServiceImpl implements CustomerService {
     @Override
     @Transactional
     public CustomerResponse createCustomer(CustomerRequest request, Long userId, Long organizationId) {
-        // 1. Check if phone already exists
         if (customerRepository.existsByPhone(request.getPhone())) {
             throw new BadRequestException("Phone number already registered");
         }
 
-        // 2. Validate route if provided
         if (request.getRouteId() != null) {
             Route route = routeRepository.findById(request.getRouteId())
                     .orElseThrow(() -> new ResourceNotFoundException("Route not found"));
@@ -49,7 +47,6 @@ public class CustomerServiceImpl implements CustomerService {
             }
         }
 
-        // 3. Validate employee if provided
         if (request.getAssignedEmployeeId() != null) {
             Employee employee = employeeRepository.findById(request.getAssignedEmployeeId())
                     .orElseThrow(() -> new ResourceNotFoundException("Employee not found"));
@@ -58,7 +55,6 @@ public class CustomerServiceImpl implements CustomerService {
             }
         }
 
-        // 4. Create customer
         Customer customer = customerMapper.toEntity(request, organizationId, userId);
         Customer savedCustomer = customerRepository.save(customer);
 
@@ -113,7 +109,6 @@ public class CustomerServiceImpl implements CustomerService {
         Customer customer = customerRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Customer not found"));
 
-        // Check if phone changed and already exists
         if (request.getPhone() != null && !request.getPhone().equals(customer.getPhone())) {
             if (customerRepository.existsByPhone(request.getPhone())) {
                 throw new BadRequestException("Phone number already registered");

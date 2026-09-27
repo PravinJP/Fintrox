@@ -78,12 +78,13 @@ public interface CustomerRepository extends JpaRepository<Customer, Long> {
     @Query("UPDATE Customer c SET c.assignedEmployeeId = :employeeId WHERE c.id = :customerId")
     void assignEmployee(@Param("customerId") Long customerId, @Param("employeeId") Long employeeId);
 
-    // ===== Financial Summary Updates =====
     @Modifying
     @Transactional
-    @Query("UPDATE Customer c SET c.totalLoansTaken = c.totalLoansTaken + 1, " +
+    @Query("UPDATE Customer c SET " +
+            "c.totalLoansTaken = c.totalLoansTaken + 1, " +
             "c.activeLoansCount = c.activeLoansCount + 1, " +
-            "c.totalLoanAmountGiven = c.totalLoanAmountGiven + :loanAmount " +
+            "c.totalLoanAmountGiven = c.totalLoanAmountGiven + :loanAmount, " +
+            "c.outstandingBalance = c.outstandingBalance + :loanAmount " +
             "WHERE c.id = :customerId")
     void addLoan(@Param("customerId") Long customerId, @Param("loanAmount") Double loanAmount);
 

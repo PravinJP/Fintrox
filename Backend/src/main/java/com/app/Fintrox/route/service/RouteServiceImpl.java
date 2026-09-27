@@ -64,11 +64,7 @@ public class RouteServiceImpl implements RouteService {
         route.setCreatedBy(userId);
         route.setActive(true);
 
-        if (user.getUserType() == UserType.INDIVIDUAL_LENDER) {
-            Employee selfEmployee = employeeRepository.findByUserId(userId)
-                    .orElseThrow(() -> new ResourceNotFoundException("Employee record not found for lender. Please contact support."));
-            route.setAssignedEmployeeId(selfEmployee.getId());
-        } else if (request.getAssignedEmployeeId() != null) {
+        if (user.getUserType() != UserType.INDIVIDUAL_LENDER && request.getAssignedEmployeeId() != null) {
             Employee employee = employeeRepository.findById(request.getAssignedEmployeeId())
                     .orElseThrow(() -> new ResourceNotFoundException("Employee not found"));
             if (!employee.getOrganizationId().equals(organizationId)) {
@@ -200,11 +196,7 @@ public class RouteServiceImpl implements RouteService {
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         if (user.getUserType() == UserType.INDIVIDUAL_LENDER) {
-            Employee selfEmployee = employeeRepository.findByUserId(userId)
-                    .orElseThrow(() -> new ResourceNotFoundException("Employee record not found"));
-            if (!selfEmployee.getId().equals(employeeId)) {
-                throw new BadRequestException("Individual lender can only assign routes to themselves");
-            }
+            throw new BadRequestException("Individual lenders cannot assign routes to employees");
         }
 
         Employee employee = employeeRepository.findById(employeeId)
@@ -233,16 +225,13 @@ public class RouteServiceImpl implements RouteService {
             throw new BadRequestException("Only individual lenders can assign routes to themselves");
         }
 
-        Employee selfEmployee = employeeRepository.findByUserId(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("Employee record not found for lender"));
-
-        if (!selfEmployee.getOrganizationId().equals(route.getOrganizationId())) {
+        if (!route.getOrganizationId().equals(user.getOrganizationId())) {
             throw new BadRequestException("Route does not belong to your organization");
         }
 
-        route.setAssignedEmployeeId(selfEmployee.getId());
+        route.setAssignedEmployeeId(null);
         Route updatedRoute = routeRepository.save(route);
-        log.info("Route assigned to self: {} by lender: {}", route.getName(), user.getEmail());
+        log.info("Route self-assigned: {} by lender: {}", route.getName(), user.getEmail());
         return routeMapper.toResponse(updatedRoute);
     }
 
@@ -305,16 +294,15 @@ public class RouteServiceImpl implements RouteService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
-        if (!organization.getOwnerId().equals(userId) && user.getUserType() != UserType.INDIVIDUAL_LENDER) {
-            throw new UnauthorizedException("You don't have permission to access this route");
-        }
-
         if (user.getUserType() == UserType.INDIVIDUAL_LENDER) {
-            Employee selfEmployee = employeeRepository.findByUserId(userId)
-                    .orElseThrow(() -> new ResourceNotFoundException("Employee not found"));
-            if (!route.getAssignedEmployeeId().equals(selfEmployee.getId())) {
+            if (!route.getCreatedBy().equals(userId)) {
                 throw new UnauthorizedException("You don't have permission to access this route");
             }
+            return;
+        }
+
+        if (!organization.getOwnerId().equals(userId)) {
+            throw new UnauthorizedException("You don't have permission to access this route");
         }
     }
 

@@ -38,61 +38,51 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         http
-                // CORS
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
 
-                // CSRF disabled because we are using JWT
                 .csrf(csrf -> csrf.disable())
 
-                // Stateless authentication
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
 
-                // Authentication error handling
                 .exceptionHandling(exception ->
                         exception.authenticationEntryPoint(authEntryPoint)
                 )
 
-                // Authorization rules
                 .authorizeHttpRequests(auth -> auth
 
-                        // Allow CORS preflight requests
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 
-                        // Authentication APIs
                         .requestMatchers("/api/auth/**").permitAll()
 
-                        // Public APIs
                         .requestMatchers("/api/public/**").permitAll()
 
-                        // Swagger
+                        .requestMatchers("/health").permitAll()
+
+
                         .requestMatchers(
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**",
                                 "/swagger-ui.html"
                         ).permitAll()
 
-                        // H2 console
+
                         .requestMatchers("/h2-console/**").permitAll()
 
-                        // Health check
+
                         .requestMatchers("/actuator/health").permitAll()
 
-                        // Everything else requires authentication
                         .anyRequest().authenticated()
                 )
 
-                // Authentication provider
                 .authenticationProvider(authenticationProvider())
 
-                // JWT filter
                 .addFilterBefore(
                         jwtAuthenticationFilter,
                         UsernamePasswordAuthenticationFilter.class
                 );
 
-        // H2 console support - development only
         http.headers(headers ->
                 headers.frameOptions(frame -> frame.disable())
         );
@@ -100,9 +90,7 @@ public class SecurityConfig {
         return http.build();
     }
 
-    /**
-     * Authentication Provider
-     */
+
     @Bean
     public DaoAuthenticationProvider authenticationProvider() {
 
@@ -114,17 +102,13 @@ public class SecurityConfig {
         return authProvider;
     }
 
-    /**
-     * Password Encoder
-     */
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
-    /**
-     * Authentication Manager
-     */
+
     @Bean
     public AuthenticationManager authenticationManager(
             AuthenticationConfiguration authConfig
@@ -133,27 +117,20 @@ public class SecurityConfig {
         return authConfig.getAuthenticationManager();
     }
 
-    /**
-     * CORS Configuration
-     */
+
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
 
         CorsConfiguration configuration = new CorsConfiguration();
 
-        /*
-         * Allow localhost during development
-         * and Vercel deployments in production.
-         */
+
         configuration.setAllowedOriginPatterns(Arrays.asList(
                 "http://localhost:*",
                 "http://127.0.0.1:*",
                 "https://*.vercel.app"
         ));
 
-        /*
-         * Allowed HTTP methods
-         */
+
         configuration.setAllowedMethods(Arrays.asList(
                 "GET",
                 "POST",
@@ -163,9 +140,7 @@ public class SecurityConfig {
                 "OPTIONS"
         ));
 
-        /*
-         * Allow all request headers
-         */
+
         configuration.setAllowedHeaders(Arrays.asList("*"));
 
 

@@ -8,15 +8,54 @@ const Sidebar: React.FC = () => {
   const user = useSelector((state: RootState) => state.auth.user);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  const menuItems = [
-    { path: '/dashboard', label: 'Dashboard', icon: 'dashboard' },
-    { path: '/employees', label: 'Employees', icon: 'badge' },
-    { path: '/routes', label: 'Routes', icon: 'route' },
-    { path: '/customers', label: 'Customers', icon: 'groups' },
-    { path: '/loans', label: 'Loans', icon: 'account_balance_wallet' },
-    { path: '/collections', label: 'Collections', icon: 'payments' },
-    { path: '/reports', label: 'Reports', icon: 'analytics' },
+  const allMenuItems = [
+    {
+      path: '/dashboard',
+      label: 'Dashboard',
+      icon: 'dashboard',
+      roles: ['OWNER', 'EMPLOYEE', 'INDIVIDUAL_LENDER'],
+    },
+    {
+      path: '/employees',
+      label: 'Employees',
+      icon: 'badge',
+      roles: ['OWNER'],
+    },
+    {
+      path: '/routes',
+      label: 'Routes',
+      icon: 'route',
+      roles: ['OWNER', 'INDIVIDUAL_LENDER'],
+    },
+    {
+      path: '/customers',
+      label: 'Customers',
+      icon: 'groups',
+      roles: ['OWNER', 'EMPLOYEE', 'INDIVIDUAL_LENDER'],
+    },
+    {
+      path: '/loans',
+      label: 'Loans',
+      icon: 'account_balance_wallet',
+      roles: ['OWNER', 'EMPLOYEE', 'INDIVIDUAL_LENDER'],
+    },
+    {
+      path: '/collections',
+      label: 'Collections',
+      icon: 'payments',
+      roles: ['OWNER', 'EMPLOYEE', 'INDIVIDUAL_LENDER'],
+    },
+    {
+      path: '/reports',
+      label: 'Reports',
+      icon: 'analytics',
+      roles: ['OWNER', 'EMPLOYEE', 'INDIVIDUAL_LENDER'],
+    },
   ];
+
+  const menuItems = allMenuItems.filter((item) =>
+    item.roles.includes(user?.userType || '')
+  );
 
   useEffect(() => {
     setIsMobileMenuOpen(false);

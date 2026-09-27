@@ -84,7 +84,7 @@ public class LoanServiceImpl implements LoanService {
             installments.add(installmentRepository.save(installment));
         }
 
-        customerRepository.addLoan(customer.getId(), savedLoan.getPrincipalAmount());
+        customerRepository.addLoan(customer.getId(), savedLoan.getTotalPayable());
         customerRepository.save(customer);
 
         log.info("Loan created: {} for customer: {} by user: {}",
