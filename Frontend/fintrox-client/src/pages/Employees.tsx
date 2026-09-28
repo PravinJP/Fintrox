@@ -370,9 +370,9 @@ const Employees: React.FC = () => {
     <div className="flex-1 p-gutter max-w-max-width mx-auto w-full">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
         <div>
-          <h1 className="font-headline-lg text-headline-lg text-on-background mb-1">
-            Employees
-          </h1>
+          <h1 className="text-3xl font-bold text-slate-900 mb-1 tracking-tight">
+  Employees
+</h1>
 
           <p className="font-body-md text-on-surface-variant">
             Manage your workforce, roles, and access.
