@@ -1,12 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { useSelector } from 'react-redux';
-import type { RootState } from '../../store/store';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useSelector, useDispatch } from 'react-redux';
+import type { RootState, AppDispatch } from '../../store/store';
+import { logout } from '../../store/slices/authSlice';
+import api from '../../api/axiosConfig';
 
 const Sidebar: React.FC = () => {
   const location = useLocation();
+  const navigate = useNavigate();
+  const dispatch = useDispatch<AppDispatch>();
   const user = useSelector((state: RootState) => state.auth.user);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [loggingOut, setLoggingOut] = useState(false);
 
   const allMenuItems = [
     {
@@ -76,6 +81,19 @@ const Sidebar: React.FC = () => {
     setIsMobileMenuOpen(false);
   };
 
+  const handleLogout = async () => {
+    setLoggingOut(true);
+    try {
+      await api.post('/auth/logout');
+    } catch (error) {
+      // Ignore errors — token will be cleared locally regardless
+    } finally {
+      dispatch(logout());
+      navigate('/login');
+      setLoggingOut(false);
+    }
+  };
+
   const getInitials = (name?: string) => {
     if (!name) return 'U';
     return name
@@ -137,6 +155,24 @@ const Sidebar: React.FC = () => {
             );
           })}
         </ul>
+
+        <div className="mt-auto border-t border-[#dde4e6] pt-3">
+          <button
+            type="button"
+            onClick={handleLogout}
+            disabled={loggingOut}
+            className="
+              flex w-full items-center gap-3 rounded-lg px-4 py-3
+              text-[#404943] transition-colors hover:bg-red-50 hover:text-red-600
+              disabled:opacity-50 disabled:cursor-not-allowed
+            "
+          >
+            <span className="material-symbols-outlined">logout</span>
+            <span className="text-[14px] leading-[20px] font-medium">
+              {loggingOut ? 'Logging out...' : 'Logout'}
+            </span>
+          </button>
+        </div>
       </nav>
 
       <header
@@ -182,7 +218,7 @@ const Sidebar: React.FC = () => {
           onClick={() => setIsMobileMenuOpen(false)}
         >
           <aside
-            className="h-full w-[280px] max-w-[85vw] bg-[#f4fafd] shadow-2xl"
+            className="h-full w-[280px] max-w-[85vw] bg-[#f4fafd] shadow-2xl flex flex-col"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between border-b border-[#dde4e6] p-5">
@@ -213,8 +249,8 @@ const Sidebar: React.FC = () => {
               </button>
             </div>
 
-            <div className="flex h-[calc(100%-81px)] flex-col p-4">
-              <ul className="flex flex-1 flex-col gap-2">
+            <div className="flex flex-1 flex-col overflow-hidden p-4">
+              <ul className="flex flex-1 flex-col gap-2 overflow-y-auto">
                 {menuItems.map((item) => {
                   const isActive = location.pathname === item.path;
                   return (
@@ -239,6 +275,24 @@ const Sidebar: React.FC = () => {
                   );
                 })}
               </ul>
+
+              <div className="mt-3 border-t border-[#dde4e6] pt-3">
+                <button
+                  type="button"
+                  onClick={handleLogout}
+                  disabled={loggingOut}
+                  className="
+                    flex w-full items-center gap-3 rounded-lg px-4 py-3
+                    text-[#404943] transition-colors hover:bg-red-50 hover:text-red-600
+                    disabled:opacity-50 disabled:cursor-not-allowed
+                  "
+                >
+                  <span className="material-symbols-outlined">logout</span>
+                  <span className="text-[14px] leading-[20px] font-medium">
+                    {loggingOut ? 'Logging out...' : 'Logout'}
+                  </span>
+                </button>
+              </div>
             </div>
           </aside>
         </div>
