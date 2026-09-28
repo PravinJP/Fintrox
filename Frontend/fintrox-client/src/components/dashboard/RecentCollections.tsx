@@ -1,67 +1,99 @@
 import React from 'react';
 
-interface RecentActivity {
-  type: string;
-  message: string;
-  timestamp: string;
-}
-
 interface RecentCollectionsProps {
-  collections: RecentActivity[];
+  collections: Array<{
+    type?: string;
+    message?: string;
+    timestamp?: string;
+    customerName?: string;
+    amount?: number;
+    collectedAt?: string;
+    route?: string;
+    time?: string;
+  }>;
 }
 
 const RecentCollections: React.FC<RecentCollectionsProps> = ({ collections }) => {
-  return (
-    <div className="lg:col-span-2 bg-white rounded-xl p-6 shadow-[0_4px_12px_rgba(45,106,79,0.05)] border border-[#bfc9c1]/30 overflow-hidden">
-      <div className="flex justify-between items-center mb-6">
-        <h3 className="text-[20px] leading-[28px] font-semibold text-[#161d1f]">
-          Recent Collections
-        </h3>
+  const formatTime = (value?: string) => {
+    if (!value) return '—';
+    const date = new Date(value);
+    if (isNaN(date.getTime())) return '—';
+    return date.toLocaleString('en-IN', {
+      day: '2-digit',
+      month: 'short',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  };
 
-        <button className="text-[#0f5238] text-[12px] leading-[16px] font-medium tracking-[0.02em] hover:underline">
+  const parseActivity = (activity: any) => {
+    // Owner format: { type, message, timestamp }
+    if (activity?.message) {
+      const match = activity.message.match(/Collection of ₹([\d.]+) from (.+)/);
+      return {
+        customer: match ? match[2] : 'Unknown',
+        amount: match ? parseFloat(match[1]) : 0,
+        time: formatTime(activity.timestamp),
+      };
+    }
+
+    // Lender/Employee format: { customerName, amount, collectedAt }
+    return {
+      customer: activity?.customerName || 'Unknown',
+      amount: Number(activity?.amount ?? 0),
+      time: formatTime(activity?.collectedAt || activity?.time),
+    };
+  };
+
+  return (
+    <div className="lg:col-span-2 bg-white rounded-xl border border-slate-200 shadow-sm p-6">
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="font-bold text-slate-900 text-lg">Recent Collections</h3>
+        <button className="text-emerald-700 text-sm font-medium hover:underline">
           View All
         </button>
       </div>
 
       <div className="overflow-x-auto">
-        <table className="w-full text-left border-collapse">
+        <table className="w-full text-left">
           <thead>
-            <tr className="border-b border-[#bfc9c1]">
-              <th className="py-3 text-[11px] leading-[16px] tracking-[0.05em] font-bold text-[#404943] uppercase">
-                Type
+            <tr className="border-b border-slate-200">
+              <th className="py-2 text-xs font-bold text-slate-500 uppercase tracking-wider">
+                Customer
               </th>
-
-              <th className="py-3 text-[11px] leading-[16px] tracking-[0.05em] font-bold text-[#404943] uppercase">
-                Collection
+              <th className="py-2 text-xs font-bold text-slate-500 uppercase tracking-wider text-right">
+                Amount
               </th>
-
-              <th className="py-3 text-[11px] leading-[16px] tracking-[0.05em] font-bold text-[#404943] uppercase text-right">
+              <th className="py-2 text-xs font-bold text-slate-500 uppercase tracking-wider text-right">
                 Time
               </th>
             </tr>
           </thead>
-
-          <tbody>
-            {collections.map((activity, index) => (
-              <tr
-                key={`${activity.timestamp}-${index}`}
-                className="border-b border-[#bfc9c1]/30 hover:bg-[#eef5f7] transition-colors"
-              >
-                <td className="py-3 text-[14px] leading-[20px] text-[#161d1f]">
-                  <span className="px-2 py-1 rounded-full bg-[#e8eff1] text-xs font-medium text-[#404943]">
-                    {activity.type}
-                  </span>
-                </td>
-
-                <td className="py-3 text-[14px] leading-[20px] text-[#161d1f] font-medium">
-                  {activity.message}
-                </td>
-
-                <td className="py-3 text-[14px] leading-[20px] text-[#404943] text-right">
-                  {new Date(activity.timestamp).toLocaleString()}
+          <tbody className="divide-y divide-slate-100">
+            {!collections || collections.length === 0 ? (
+              <tr>
+                <td colSpan={3} className="py-6 text-center text-slate-400 text-sm">
+                  No recent collections
                 </td>
               </tr>
-            ))}
+            ) : (
+              collections.map((activity, index) => {
+                const parsed = parseActivity(activity);
+                return (
+                  <tr key={index} className="hover:bg-slate-50">
+                    <td className="py-3 text-sm text-slate-900 font-medium">
+                      {parsed.customer}
+                    </td>
+                    <td className="py-3 text-sm font-semibold text-emerald-700 text-right">
+                      ₹{parsed.amount.toLocaleString('en-IN')}
+                    </td>
+                    <td className="py-3 text-sm text-slate-500 text-right">
+                      {parsed.time}
+                    </td>
+                  </tr>
+                );
+              })
+            )}
           </tbody>
         </table>
       </div>
